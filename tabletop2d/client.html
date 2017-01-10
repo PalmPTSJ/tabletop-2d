@@ -1,0 +1,246 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<title>Hello</title>
+		<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script src="../extend.min.js"></script>
+		<script src="../jquery.js"></script>
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+
+		<script src="gameObject.js"></script>
+        <script src="components.js"></script>
+        
+        <style>
+            #prefabList > * {
+                cursor:pointer;
+            }
+        </style>
+        
+	</head>
+	<body style="padding:0px 50px;">
+    
+        <div class="row">
+            <div class="col m8" style="">
+				<div style="width:100%">
+					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1">
+				
+					</canvas>
+				</div>
+            </div>
+            <div class="col m2">
+				<div id="prefabListDiv">
+					<h4>Prefab</h4>
+                    <ul id="prefabList" class="collection">
+                        
+                    </ul>
+				</div>
+                <div id="objectListDiv">
+					<h4>Object list</h4>
+                    <ul id="objectList" class="collection">
+                        
+                    </ul>
+				</div>
+            </div>
+			<div class="col m2" style="background-color:green;">
+                <p id="debug"></p>
+			</div>
+        </div>
+	</body>
+	<script>
+    
+        var classList = {
+            "Base" : Base,
+            "Component" : Component,
+            "ComponentTransform" : ComponentTransform,
+            "ComponentImageRenderer" : ComponentImageRenderer,
+            "ComponentCursorCollider" : ComponentCursorCollider,
+            "ComponentRectRenderer" : ComponentRectRenderer,
+            "ComponentNetwork" : ComponentNetwork,
+            "ComponentBoardGameController" : ComponentBoardGameController,
+            "Prefab" : Prefab,
+            "GameObject" : GameObject
+        }
+    
+		var canvas = document.getElementById("gameCanvas");
+		var ctx = canvas.getContext("2d");
+		
+		var objectList = [];
+        var prefabList = {};
+		
+        var ip = prompt("Please enter ip address");
+        
+		var socket = io('http://'+ip+':8080');
+        
+		socket.on('log',function (data) {
+			console.log("Data : ",data);
+		})
+        
+        socket.on('newPrefab',function (data) {
+            var prefab = new Prefab();
+            prefab.fromJSON(data)
+            prefabList[prefab.id] = prefab;
+            
+            // create new collection button
+            var prefabCollection = document.createElement("li");
+            prefabCollection.className = "collection-item";
+            prefabCollection.innerHTML = prefab.name;
+            prefabCollection.onclick = function() {
+                // emit object create event
+                var obj = createObjectFromPrefab(prefab);
+                socket.emit("createObject",obj);
+            }
+            document.getElementById("prefabList").appendChild(prefabCollection);
+            console.log("New prefab",prefab);
+        });
+        
+        socket.on('newObject',function(data) {
+            var obj = new GameObject();
+            obj.fromJSON(data);
+            objectList[obj.id] = obj;
+        });
+        
+        socket.on('updateObject',function(data) {
+            // update object of that id
+            objectList[data.id].fromJSON(data);
+        });
+        
+        socket.on('deleteObject',function(id) {
+            if(selectingObject.has(objectList[id])) selectingObject.delete(objectList[id]);
+            delete objectList[id];
+        });
+		
+        function createObjectFromPrefab(prefab) {
+            var obj = prefab.instantiate();
+            obj.getComponent("transform").pos.x = canvasX + canvas.width/2;
+            obj.getComponent("transform").pos.y = canvasY + canvas.height/2;
+            return obj;
+        }
+        
+		function update(timestamp) {
+            // setup canvas
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.save();
+            ctx.translate(  -((canvasX+canvas.width/2)*canvasScale - canvas.width/2),
+                            -((canvasY+canvas.height/2)*canvasScale - canvas.height/2));
+            ctx.scale(canvasScale,canvasScale);
+            $("#debug").html("sc = "+canvasScale+" "+canvasX+","+canvasY);
+            // update every object
+			for(var id in objectList) objectList[id].update(timestamp);
+			
+            ctx.restore();
+            window.requestAnimationFrame(update);
+		}
+		
+		window.requestAnimationFrame(update);
+		
+		// canvas controller
+        var canvasScale = 1;
+        var canvasX = 0; // in default scale
+        var canvasY = 0; // in default scale
+        
+        canvas.width = $(canvas.parentNode).innerWidth();
+        canvas.height = canvas.width / (4/3);
+        
+        $(canvas).css("width",canvas.width);
+        $(canvas).css("height",canvas.height);
+        
+		canvas.addEventListener("mousewheel", mouseWheelHandler, false);
+		canvas.addEventListener("DOMMouseScroll", mouseWheelHandler, false);
+        function mouseWheelHandler(e) {
+            var e = window.event || e; // old IE support
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+            if(delta < 0) {
+                canvasScale /= 1.25;
+            }
+            else {
+                canvasScale *= 1.25;
+            }
+        }
+        
+        var mouseLastPos = {x:0,y:0,down:false};
+        var selectingObject = new Set();
+        canvas.addEventListener("mousedown",function (e) {
+            mouseLastPos = {
+                x           : e.pageX - $(canvas).offset().left,
+                y           : e.pageY - $(canvas).offset().top,
+                down        : true,
+                move        : false,
+                moveLength  : 0,
+                isMovingObject : false
+            }
+            var clickPos = {
+                x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
+                y : canvasY + canvas.height/2 + (mouseLastPos.y-canvas.height/2)/canvasScale
+            }
+            for(var obj of selectingObject)
+                if(obj.getComponent("cursorCollider") && obj.getComponent("cursorCollider").isOver(clickPos))
+                    mouseLastPos.isMovingObject = true;
+        });
+        
+        canvas.addEventListener("mousemove",function (e) {
+            if(!mouseLastPos.down) return;
+            var offX = e.pageX - $(canvas).offset().left - mouseLastPos.x;
+            var offY = e.pageY - $(canvas).offset().top - mouseLastPos.y;
+            if(mouseLastPos.isMovingObject) {
+                for(var obj of selectingObject) {
+                    obj.getComponent("transform").pos.x += offX / canvasScale;
+                    obj.getComponent("transform").pos.y += offY / canvasScale;
+                }
+            }
+            else {
+                canvasX -= offX / canvasScale;
+                canvasY -= offY / canvasScale;
+            }
+            mouseLastPos.x = e.pageX - $(canvas).offset().left;
+            mouseLastPos.y = e.pageY - $(canvas).offset().top;
+            mouseLastPos.move = true;
+            mouseLastPos.moveLength += Math.abs(offX+offY) + mouseLastPos.moveLength;
+        });
+        
+        canvas.addEventListener("mouseup",function (e) {
+            mouseLastPos.down = false;
+            if(mouseLastPos.moveLength <= 5) {
+                var clickPos = {
+                    x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
+                    y : canvasY + canvas.height/2 + (mouseLastPos.y-canvas.height/2)/canvasScale
+                }
+                // click !
+                if(!isKeyDown[16]) selectingObject.clear();
+                for(var name in objectList) {
+                    var obj = objectList[name];
+                    if(obj.getComponent("cursorCollider") && obj.getComponent("cursorCollider").isOver(clickPos)) {
+                        // click on this object
+                        selectingObject.add(obj);
+                        break;
+                    }
+                }
+            }
+        });
+        
+        var isKeyDown = {};
+        
+        canvas.addEventListener("keydown",function (e) {
+            e = e || window.event; 
+            var charCode = e.charCode || e.keyCode;
+            isKeyDown[charCode] = true;
+        });
+        
+        canvas.addEventListener("keyup",function (e) {
+            e = e || window.event; 
+            var charCode = e.charCode || e.keyCode;
+            isKeyDown[charCode] = false;
+        });
+        
+        canvas.addEventListener("keypress",function (e) {
+            e = e || window.event; 
+            var charCode = e.charCode || e.keyCode;
+            // call boardGameObject.keyPress
+            for(var obj of selectingObject) {
+                obj.getComponent("boardGameController").onKeyPress(charCode);
+            }
+        });
+	
+	</script>
+</html>
