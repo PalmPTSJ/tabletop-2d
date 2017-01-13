@@ -57,8 +57,9 @@
             "ComponentCursorCollider" : ComponentCursorCollider,
             "ComponentRectRenderer" : ComponentRectRenderer,
             "ComponentNetwork" : ComponentNetwork,
-            "ComponentBoardGameController" : ComponentBoardGameController,
+            "ComponentTabletopObject" : ComponentTabletopObject,
             "Prefab" : Prefab,
+            "EmptyPrefab" : EmptyPrefab,
             "GameObject" : GameObject
         }
     
@@ -74,10 +75,11 @@
         
 		socket.on('log',function (data) {
 			console.log("Data : ",data);
-		})
+		});
         
         socket.on('newPrefab',function (data) {
-            var prefab = new Prefab();
+            var prefab = new EmptyPrefab();
+            console.log("New Prefab data",data);
             prefab.fromJSON(data)
             prefabList[prefab.id] = prefab;
             
@@ -112,8 +114,10 @@
 		
         function createObjectFromPrefab(prefab) {
             var obj = prefab.instantiate();
-            obj.getComponent("transform").pos.x = canvasX + canvas.width/2;
-            obj.getComponent("transform").pos.y = canvasY + canvas.height/2;
+            obj.getComponent(ComponentTransform).pos = {
+                x : canvasX + canvas.width/2,
+                y : canvasY + canvas.height/2
+            }
             return obj;
         }
         
@@ -174,7 +178,7 @@
                 y : canvasY + canvas.height/2 + (mouseLastPos.y-canvas.height/2)/canvasScale
             }
             for(var obj of selectingObject)
-                if(obj.getComponent("cursorCollider") && obj.getComponent("cursorCollider").isOver(clickPos))
+                if(obj.getComponent(ComponentCursorCollider) && obj.getComponent(ComponentCursorCollider).isOver(clickPos))
                     mouseLastPos.isMovingObject = true;
         });
         
@@ -184,8 +188,8 @@
             var offY = e.pageY - $(canvas).offset().top - mouseLastPos.y;
             if(mouseLastPos.isMovingObject) {
                 for(var obj of selectingObject) {
-                    obj.getComponent("transform").pos.x += offX / canvasScale;
-                    obj.getComponent("transform").pos.y += offY / canvasScale;
+                    obj.getComponent(ComponentTransform).pos.x += offX / canvasScale;
+                    obj.getComponent(ComponentTransform).pos.y += offY / canvasScale;
                 }
             }
             else {
@@ -209,7 +213,7 @@
                 if(!isKeyDown[16]) selectingObject.clear();
                 for(var name in objectList) {
                     var obj = objectList[name];
-                    if(obj.getComponent("cursorCollider") && obj.getComponent("cursorCollider").isOver(clickPos)) {
+                    if(obj.getComponent(ComponentCursorCollider) && obj.getComponent(ComponentCursorCollider).isOver(clickPos)) {
                         // click on this object
                         selectingObject.add(obj);
                         break;
@@ -237,7 +241,7 @@
             var charCode = e.charCode || e.keyCode;
             // call boardGameObject.keyPress
             for(var obj of selectingObject) {
-                obj.getComponent("boardGameController").onKeyPress(charCode);
+                obj.getComponent(ComponentTabletopObject).onKeyPress(charCode);
             }
         });
 	

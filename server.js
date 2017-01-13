@@ -10,8 +10,8 @@ function getDebugName(socket) { return "["+socket.name+":"+socket.id+"]"; }
 var objectList = {};
 var prefabList = {};
 
-var objectId = 0;
-var prefabId = 0;
+var objectIdGenerator = 0;
+var prefabIdGenerator = 0;
 
 
 io.on('connection',function (socket) {
@@ -34,8 +34,8 @@ io.on('connection',function (socket) {
 	});
 	
 	socket.on('createPrefab',function (prefab) {
-        console.log("New prefab created");
-		var id = prefabId++;
+        console.log("New prefab created",prefab,prefab.components[0].size);
+		var id = prefabIdGenerator++;
 		prefab.id = id;
 		prefabList[id] = prefab;
 		io.emit('newPrefab',prefab);
@@ -44,7 +44,7 @@ io.on('connection',function (socket) {
 	socket.on('createObject',function (obj) {
         console.log("New object created");
 		// create object from prefab
-		var id = objectId++;
+		var id = objectIdGenerator++;
         obj.id = id;
 		objectList[id] = obj;
 		io.emit('newObject',obj);

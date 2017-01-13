@@ -3,11 +3,12 @@ How to use : Copy and paste this code into console
 Author : PalmPTSJ
 **/
 var boardPrefab = new Prefab("Board");
-boardPrefab.getComponent("transform").pos.z = -1;
+boardPrefab.getComponent(ComponentTransform).fromJSON({
+    pos : {x:0,y:0,z:-1},
+    size : {width:600,height:600}
+})
 boardPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
-    url     : "http://www.chesshouse.com/v/vspfiles/photos/CHW31-2.jpg",
-    width   : 600,
-    height  : 600
+    url     : "http://www.chesshouse.com/v/vspfiles/photos/CHW31-2.jpg"
 }));
 
 var pieceImage = {
@@ -28,15 +29,12 @@ socket.emit('createPrefab',boardPrefab);
 
 for(var name in pieceImage) {
     var prefab = new Prefab(name);
-    prefab.addComponent((new ComponentCursorCollider()).fromJSON({
-        width  : 30,
-        height : 50
-    }));
+    prefab.getComponent(ComponentTransform).fromJSON({
+        size    : {width:30,height:50}
+    })
+    prefab.addComponent(new ComponentCursorCollider());
     prefab.addComponent((new ComponentImageRenderer()).fromJSON({
         url     : pieceImage[name],
-        width   : 30,
-        height  : 50
     }));
-    console.log(prefab);
     socket.emit('createPrefab',prefab);
 }

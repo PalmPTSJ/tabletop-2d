@@ -3,6 +3,16 @@ class Component extends Base {
         super();
         this.componentName = name;
     }
+    toJSON() {
+        return Object.assign(super.toJSON(),{
+            id : this.id
+        });
+    }
+    fromJSON(data) {
+        super.fromJSON(data);
+        if(data.id) this.id = data.id;
+        return this;
+    }
     onStart() {
         
     }
@@ -14,14 +24,13 @@ class Component extends Base {
     }
 }
 
-class ComponentBoardGameController extends Component {
+class ComponentTabletopObject extends Component {
     constructor(name) {
-        super("boardGameController");
+        super("tabletopObject");
     }
     onKeyPress(key) {
         super.onKeyPress(key);
-        if(key == 46) {
-            // delete
+        if(key == 46) { // delete
             socket.emit("deleteObject",this.gameObject.id);
         }
     }
@@ -32,16 +41,19 @@ class ComponentTransform extends Component {
         super("transform");
         this.parent = null;
         this.pos = {x:0,y:0,z:0};
+        this.size = {width:0,height:0};
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
-            pos : this.pos,
-            parentId : this.parent==null?null:this.parent.getGameObject().id
+            pos         : this.pos,
+            size        : this.size,
+            parentId    : this.parent==null?null:this.parent.getGameObject().id
         });
     }
     fromJSON(data) {
         super.fromJSON(data);
         this.pos = data.pos;
+        this.size = data.size;
         this.parent = data.parentId==null?null:objectList[data.parentId];
         return this;
     }
@@ -58,26 +70,20 @@ class ComponentTransform extends Component {
 class ComponentCursorCollider extends Component { // This component allow cursor to click this object
     constructor() {
         super("cursorCollider");
-        this.width = 0;
-        this.height = 0;
     }
     toJSON() {
-        return Object.assign(super.toJSON(),{
-            width : this.width,
-            height : this.height
-        });
+        return super.toJSON();
     }
     fromJSON(data) {
         super.fromJSON(data);
-        this.width = data.width;
-        this.height = data.height;
         return this;
     }
     isOver(cursorPos) {
         // check hit with point
-        var pos = this.gameObject.getComponent("transform").getAbsolutePos();
-        if( pos.x <= cursorPos.x && cursorPos.x <= pos.x + this.width &&
-            pos.y <= cursorPos.y && cursorPos.y <= pos.y + this.height) {
+        var transform = this.gameObject.getComponent(ComponentTransform);
+        var pos = transform.getAbsolutePos();
+        if( pos.x <= cursorPos.x && cursorPos.x <= pos.x + transform.size.width &&
+            pos.y <= cursorPos.y && cursorPos.y <= pos.y + transform.size.height) {
             return true;
         }
         return false;
@@ -86,11 +92,12 @@ class ComponentCursorCollider extends Component { // This component allow cursor
         super.onUpdate(timestamp);
         if(selectingObject.has(this.gameObject)) {
             // draw outline
-            var pos = this.gameObject.getComponent("transform").getAbsolutePos();
+            var transform = this.gameObject.getComponent(ComponentTransform);
+            var pos = transform.getAbsolutePos();
             ctx.strokeStyle = "#8CF";
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.rect(pos.x,pos.y,this.width,this.height);
+            ctx.rect(pos.x,pos.y,transform.size.width,transform.size.height);
             ctx.stroke();
         }
     }
@@ -114,7 +121,7 @@ class ComponentNetwork extends Component {
     }
     onUpdate(timestamp) {
         super.onUpdate(timestamp);
-        if(this.lastTimestamp == null || timestamp-this.lastTimestamp >= 50) { // update every 50 ms
+        if(this.lastTimestamp == null || timestamp-this.lastTimestamp >= 100) { // update every 50 ms
             var nowJSON = JSON.stringify(this.gameObject.toJSON());
             if(nowJSON != this.lastJSON) {
                 this.lastJSON = nowJSON;
@@ -134,15 +141,11 @@ class ComponentImageRenderer extends Component { // This component render object
     toJSON() {
         return Object.assign(super.toJSON(),{
             url : this.url,
-            width : this.width,
-            height : this.height
         });
     }
     fromJSON(data) {
         super.fromJSON(data);
         this.url = data.url;
-        this.width = data.width;
-        this.height = data.height;
         
         this.img = new Image;
         if(this.url) this.img.src = this.url;
@@ -153,7 +156,7 @@ class ComponentImageRenderer extends Component { // This component render object
     onUpdate(timestamp) {
         super.onUpdate(timestamp);
         // draw this object !
-        if(!this.gameObject.getComponent("transform")) {
+        if(!this.gameObject.getComponent(ComponentTransform)) {
             console.log("[ImageRenderer] can't find transform");
             return;
         }
@@ -161,9 +164,9 @@ class ComponentImageRenderer extends Component { // This component render object
             console.log("[ImageRenderer] can't load image");
             return;
         }
-        var transform = this.gameObject.getComponent("transform");
+        var transform = this.gameObject.getComponent(ComponentTransform);
         var pos = transform.getAbsolutePos();
-        ctx.drawImage(this.img,pos.x,pos.y,this.width,this.height);
+        ctx.drawImage(this.img,pos.x,pos.y,transform.size.width,transform.size.height);
     }
 }
 
@@ -173,15 +176,11 @@ class ComponentRectRenderer extends Component { // Render rectangle
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
-            width : this.width,
-            height : this.height,
             color : this.color
         });
     }
     fromJSON(data) {
         super.fromJSON(data);
-        this.width = data.width;
-        this.height = data.height;
         this.color = data.color;
         return this;
     }
@@ -189,15 +188,15 @@ class ComponentRectRenderer extends Component { // Render rectangle
     onUpdate(timestamp) {
         super.onUpdate(timestamp);
         // draw this object !
-        if(!this.gameObject.getComponent("transform")) {
+        if(!this.gameObject.getComponent(ComponentTransform)) {
             console.log("[RectRenderer] can't find transform");
             return;
         }
-        var transform = this.gameObject.getComponent("transform");
+        var transform = this.gameObject.getComponent(ComponentTransform);
         var pos = transform.getAbsolutePos();
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.rect(pos.x,pos.y,this.width,this.height);
+        ctx.rect(pos.x,pos.y,transform.size.width,transform.size.height);
         ctx.fill();
     }
 }
