@@ -2,13 +2,6 @@ class ComponentCursorCollider extends Component { // This component allow cursor
     constructor() {
         super("cursorCollider");
     }
-    toJSON() {
-        return super.toJSON();
-    }
-    fromJSON(data) {
-        super.fromJSON(data);
-        return this;
-    }
     isOver(cursorPos) {
         // check hit with point
         var transform = this.gameObject.getComponent(ComponentTransform);

@@ -12,7 +12,7 @@ class ComponentRenderer extends Component {
     }
     fromJSON(data) {
         super.fromJSON(data);
-        if(data.enabled) this.enabled = data.enabled;
+        if(data.enabled !== undefined) this.enabled = data.enabled;
         return this;
     }
     

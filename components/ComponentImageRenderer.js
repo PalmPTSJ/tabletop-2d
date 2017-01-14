@@ -9,11 +9,7 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
     }
     fromJSON(data) {
         super.fromJSON(data);
-        this.url = data.url;
-        
-        this.img = new Image;
-        if(this.url) this.img.src = this.url;
-        
+        if(data.url) this.applyImage(data.url);
         return this;
     }
     
@@ -23,16 +19,24 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
     
     render() {
         if(!this.gameObject.getComponent(ComponentTransform)) {
-            console.log("[ImageRenderer] can't find transform");
+            //console.log("[ImageRenderer] can't find transform");
             return;
         }
-        if(!this.img) {
-            console.log("[ImageRenderer] can't load image");
+        if(!this.url || !this.img) {
+            //console.log("[ImageRenderer] can't load image");
             return;
         }
         var transform = this.gameObject.getComponent(ComponentTransform);
         var pos = transform.getAbsolutePos();
         ctx.drawImage(this.img,pos.x,pos.y,transform.size.width,transform.size.height);
+    }
+    
+    applyImage(url) {
+        this.url = url;
+        
+        this.img = new Image;
+        if(this.url) this.img.src = this.url;
+        
     }
 }
 

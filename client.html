@@ -33,7 +33,11 @@
 					</canvas>
 				</div>
             </div>
-            <div class="col m2">
+            <div class="col m4">
+                <div id="">
+                    <h4>Console & Debug</h4>
+                    <p id="debug"></p>
+                </div>
 				<div id="prefabListDiv">
 					<h4>Prefab</h4>
                     <ul id="prefabList" class="collection">
@@ -47,23 +51,24 @@
                     </ul>
 				</div>
             </div>
-			<div class="col m2" style="background-color:green;">
-                <p id="debug"></p>
-			</div>
         </div>
 	</body>
     
     <!-- Include components -->
     <script src="components/Component.js"></script>
+    
     <script src="components/ComponentTransform.js"></script>
     <script src="components/ComponentTabletopObject.js"></script>
     <script src="components/ComponentNetwork.js"></script>
+    
     <script src="components/ComponentCursorCollider.js"></script>
     
     <script src="components/ComponentRenderer.js"></script>
     <script src="components/ComponentImageRenderer.js"></script>
     <script src="components/ComponentRectRenderer.js"></script>
     <script src="components/ComponentTextRenderer.js"></script>
+    
+    <script src="components/ComponentImageRendererMulti.js"></script>
     <!-- End include components -->
     
 	<script>
@@ -129,7 +134,7 @@
         });
         
         socket.on('deleteObject',function(id) {
-            var obj = getObjectFromId(data.id);
+            var obj = getObjectFromId(id);
             if(selectingObject.has(obj)) selectingObject.delete(obj);
             objectList.splice(objectList.indexOf(obj));
         });
@@ -148,7 +153,7 @@
             ctx.translate(  -((canvasX+canvas.width/2)*canvasScale - canvas.width/2),
                             -((canvasY+canvas.height/2)*canvasScale - canvas.height/2));
             ctx.scale(canvasScale,canvasScale);
-            $("#debug").html("sc = "+canvasScale+" "+canvasX+","+canvasY);
+            $("#debug").html("Canvas position = "+Math.floor(canvasX)+","+Math.floor(canvasY)+" (scale "+Math.round(canvasScale*100)/100+")");
             // update every object
 			for(var obj of objectList) obj.update(timestamp);
 			
@@ -260,7 +265,7 @@
             var charCode = e.charCode || e.keyCode;
             // call boardGameObject.keyPress
             for(var obj of selectingObject) {
-                obj.getComponent(ComponentTabletopObject).onKeyPress(charCode);
+                obj.onKeyPress(charCode);
             }
         });
 	
