@@ -34,7 +34,7 @@ io.on('connection',function (socket) {
 	});
 	
 	socket.on('createPrefab',function (prefab) {
-        console.log("New prefab created",prefab,prefab.components[0].size);
+        console.log("New prefab created");
 		var id = prefabIdGenerator++;
 		prefab.id = id;
 		prefabList[id] = prefab;

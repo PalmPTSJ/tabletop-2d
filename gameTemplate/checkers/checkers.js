@@ -1,7 +1,9 @@
 /** Tabletop2d template for checkers
-How to use : Copy and paste this code into console
-Author : PalmPTSJ
+How to use  : Copy and paste this code into console
+Author      : PalmPTSJ
 **/
+
+// Create prefab
 var boardPrefab = new Prefab("Board");
 boardPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:-1},
@@ -9,6 +11,9 @@ boardPrefab.getComponent(ComponentTransform).fromJSON({
 });
 boardPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
     url     : "http://www.chesshouse.com/v/vspfiles/photos/CHW31-2.jpg"
+}));
+boardPrefab.addComponent((new ComponentTextRenderer()).fromJSON({
+    text : "Welcome to tabletop 2d ! Let's play checkers !"
 }));
 
 var blackPiecePrefab = new Prefab("Black Piece");
@@ -56,3 +61,5 @@ socket.emit('createPrefab',blackPiecePrefab.toJSON());
 socket.emit('createPrefab',blackKingPrefab.toJSON());
 socket.emit('createPrefab',whitePiecePrefab.toJSON());
 socket.emit('createPrefab',whiteKingPrefab.toJSON());
+
+// create object
