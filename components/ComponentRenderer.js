@@ -4,6 +4,7 @@ class ComponentRenderer extends Component {
     constructor() {
         super("renderer");
         this.enabled = true;
+        this.enabledThisFrame = true;
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
@@ -17,11 +18,13 @@ class ComponentRenderer extends Component {
     }
     
     onUpdate(timestamp) {
-        super.onUpdate(timestamp);
-        // render if enabled
-        if(this.enabled) this.render();
+        if(!super.onUpdate(timestamp)) return false;
+        
+        this.render();
+        
+        return true;
     }
-    
+
     render() {} // (Abstract: Every renderer have to implement this function)
     
 }

@@ -19,7 +19,7 @@ class ComponentNetwork extends Component {
         this.lastJSON = JSON.stringify(this.gameObject.toJSON());
     }
     onUpdate(timestamp) {
-        super.onUpdate(timestamp);
+        if(!super.onUpdate(timestamp)) return false;
         if(this.lastTimestamp == null || timestamp-this.lastTimestamp >= 100) { // update every 100 ms
             var nowJSON = JSON.stringify(this.gameObject.toJSON());
             if(nowJSON != this.lastJSON) {
@@ -28,6 +28,7 @@ class ComponentNetwork extends Component {
             }
             this.lastTimestamp = timestamp;
         }
+        return true;
     }
 }
 

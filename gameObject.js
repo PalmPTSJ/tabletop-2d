@@ -36,8 +36,10 @@ class EmptyPrefab extends Base {
         super.fromJSON(data);
         this.name = data.name;
         this.id = data.id;
+        var dataComponentsId = new Set();
         for(var comp of data.components) {
             var updated = false;
+            dataComponentsId.add(comp.id);
             for(var myComp of this.components) {
                 if(myComp.id == comp.id) {
                     // update
@@ -53,6 +55,10 @@ class EmptyPrefab extends Base {
                 this.addComponent(newComp);
                 newComp.id = comp.id;
             }
+        }
+        // delete component not in data
+        for(var i = this.components.length-1;i >= 0;i--) {
+            if(!dataComponentsId.has(this.components[i].id)) this.components.splice(i,1); 
         }
         this.componentIdGenerator = data.componentIdGenerator;
         return this;

@@ -12,10 +12,14 @@ var prefabList = {};
 
 var objectIdGenerator = 0;
 var prefabIdGenerator = 0;
-
+var playerIdGenerator = 0;
 
 io.on('connection',function (socket) {
 	console.log("New connection from : "+socket);
+    
+    socket.emit('playerInfo',{
+        id : playerIdGenerator++
+    });
     
     // send all object and prefab
     for(var prefab in prefabList) {

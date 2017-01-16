@@ -15,11 +15,7 @@ class ComponentTextRenderer extends ComponentRenderer {
         if(data.text !== undefined) this.text = data.text;
         return this;
     }
-    
-    onUpdate(timestamp) {
-        super.onUpdate(timestamp);
-    }
-    
+
     render() {
         if(!this.gameObject.getComponent(ComponentTransform)) {
             console.log("[TextRenderer] can't find transform");

@@ -13,7 +13,7 @@ class ComponentCursorCollider extends Component { // This component allow cursor
         return false;
     }
     onUpdate(timestamp) {
-        super.onUpdate(timestamp);
+        if(!super.onUpdate(timestamp)) return false;
         if(selectingObject.has(this.gameObject)) {
             // draw outline
             var transform = this.gameObject.getComponent(ComponentTransform);
@@ -24,6 +24,7 @@ class ComponentCursorCollider extends Component { // This component allow cursor
             ctx.rect(pos.x,pos.y,transform.size.width,transform.size.height);
             ctx.stroke();
         }
+        return true;
     }
 }
 

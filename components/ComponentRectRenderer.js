@@ -13,10 +13,6 @@ class ComponentRectRenderer extends ComponentRenderer { // Render rectangle
         return this;
     }
     
-    onUpdate(timestamp) {
-        super.onUpdate(timestamp);
-    }
-    
     render() {
         if(!this.gameObject.getComponent(ComponentTransform)) {
             console.log("[RectRenderer] can't find transform");

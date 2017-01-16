@@ -58,8 +58,10 @@
     <script src="components/Component.js"></script>
     
     <script src="components/ComponentTransform.js"></script>
-    <script src="components/ComponentTabletopObject.js"></script>
     <script src="components/ComponentNetwork.js"></script>
+    
+    <script src="components/ComponentTabletopObject.js"></script>
+    <script src="components/ComponentObjectInHand.js"></script>
     
     <script src="components/ComponentCursorCollider.js"></script>
     
@@ -67,8 +69,8 @@
     <script src="components/ComponentImageRenderer.js"></script>
     <script src="components/ComponentRectRenderer.js"></script>
     <script src="components/ComponentTextRenderer.js"></script>
-    
     <script src="components/ComponentImageRendererMulti.js"></script>
+    
     <!-- End include components -->
     
 	<script>
@@ -77,6 +79,8 @@
 		
 		var objectList = [];
         var prefabList = {};
+        
+        var playerInfo = {};
         
         function getObjectFromId(id) {
             for(var obj of objectList) {
@@ -137,6 +141,10 @@
             var obj = getObjectFromId(id);
             if(selectingObject.has(obj)) selectingObject.delete(obj);
             objectList.splice(objectList.indexOf(obj));
+        });
+        
+        socket.on('playerInfo',function(data) {
+            playerInfo = data;
         });
 		
         function createObjectFromPrefab(prefab) {

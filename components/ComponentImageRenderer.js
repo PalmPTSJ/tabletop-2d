@@ -13,10 +13,6 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
         return this;
     }
     
-    onUpdate(timestamp) {
-        super.onUpdate(timestamp);
-    }
-    
     render() {
         if(!this.gameObject.getComponent(ComponentTransform)) {
             //console.log("[ImageRenderer] can't find transform");
