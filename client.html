@@ -37,6 +37,7 @@
                 <div id="">
                     <h4>Console & Debug</h4>
                     <p id="debug"></p>
+                    <p id="debugFPS"></p>
                 </div>
 				<div id="prefabListDiv">
 					<h4>Prefab</h4>
@@ -82,6 +83,8 @@
         
         var playerInfo = {};
         
+        var fpsCount = 0;
+        
         function getObjectFromId(id) {
             for(var obj of objectList) {
                 if(obj.id == id) return obj;
@@ -97,6 +100,17 @@
                 else if(ta.pos.z == tb.pos.z) return 0;
                 return 1;
             })
+        }
+        
+        
+        var idGenerator = 0;
+        function generateNewId() {
+            // generate new id in form [Player id]_[Int]
+            if(playerInfo.id === undefined) {
+                console.log("Id generation request when playerInfo is not ready");
+                return "GG";
+            }
+            return ""+playerInfo.id+"_"+(idGenerator++);
         }
 		
         var ip = prompt("Please enter ip address","127.0.0.1");
@@ -166,6 +180,9 @@
 			for(var obj of objectList) obj.update(timestamp);
 			
             ctx.restore();
+            
+            fpsCount++;
+            
             window.requestAnimationFrame(update);
 		}
 		
@@ -276,6 +293,11 @@
                 obj.onKeyPress(charCode);
             }
         });
+        
+        window.setInterval(()=>{
+            $("#debugFPS").html("FPS : "+fpsCount);
+            fpsCount = 0;
+        },1000);
 	
 	</script>
 </html>

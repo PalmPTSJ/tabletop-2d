@@ -29,8 +29,8 @@ class ComponentObjectInHand extends Component {
         }
         
         // draw highlight
-        if(playerInfo.id == this.player) ctx.fillStyle = "#F80";
-        else ctx.fillStyle = "#F00";
+        if(playerInfo.id == this.player) ctx.fillStyle = "#8FF";
+        else ctx.fillStyle = "#FA0";
         
         var transform = this.gameObject.getComponent(ComponentTransform);
         var pos = transform.getAbsolutePos();

@@ -39,7 +39,7 @@ io.on('connection',function (socket) {
 	
 	socket.on('createPrefab',function (prefab) {
         console.log("New prefab created");
-		var id = prefabIdGenerator++;
+		var id = "SP_"+(prefabIdGenerator++);
 		prefab.id = id;
 		prefabList[id] = prefab;
 		io.emit('newPrefab',prefab);
@@ -48,7 +48,7 @@ io.on('connection',function (socket) {
 	socket.on('createObject',function (obj) {
         console.log("New object created");
 		// create object from prefab
-		var id = objectIdGenerator++;
+		var id = "SO_"+(objectIdGenerator++);
         obj.id = id;
 		objectList[id] = obj;
 		io.emit('newObject',obj);

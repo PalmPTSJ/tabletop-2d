@@ -1,6 +1,6 @@
 class Base {
     constructor () {
-        this.id = -1;
+        this.id = null;
     }
     toJSON() {
         return {
@@ -17,14 +17,12 @@ class EmptyPrefab extends Base {
         super();
         this.components = [];
         this.name = name;
-        this.componentIdGenerator = 0;
     }
     toJSON() {
         // compress this prefab into object
         var obj = Object.assign(super.toJSON(),{
             name : this.name,
             id : this.id,
-            componentIdGenerator : this.componentIdGenerator,
             components : []
         });
         for(var comp of this.components) {
@@ -60,7 +58,6 @@ class EmptyPrefab extends Base {
         for(var i = this.components.length-1;i >= 0;i--) {
             if(!dataComponentsId.has(this.components[i].id)) this.components.splice(i,1); 
         }
-        this.componentIdGenerator = data.componentIdGenerator;
         return this;
     }
     
@@ -78,7 +75,7 @@ class EmptyPrefab extends Base {
         return toRet;
     }
     addComponent(comp) {
-        if(!comp.id || comp.id == -1) comp.id = this.componentIdGenerator++;
+        if(!comp.id || comp.id == null) comp.id = generateNewId();
         this.components.push(comp);
     }
     deleteComponent(comp) {
