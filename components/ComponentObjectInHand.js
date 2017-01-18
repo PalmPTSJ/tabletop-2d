@@ -2,6 +2,8 @@ class ComponentObjectInHand extends Component {
     constructor(name) {
         super("objectInHand");
         this.player = 0;
+        this.handImg = new Image;
+        this.handImg.src = "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/magic-marker-icons-people-things/115757-magic-marker-icon-people-things-hand22-sc48.png";
     }
     
     toJSON() {
@@ -26,6 +28,9 @@ class ComponentObjectInHand extends Component {
                 this.gameObject.getComponent(ComponentRenderer).disableForThisFrame();
             if(this.gameObject.getComponent(ComponentCursorCollider))
                 this.gameObject.getComponent(ComponentCursorCollider).disableForThisFrame();
+            
+            
+            
         }
         
         // draw highlight
@@ -34,9 +39,13 @@ class ComponentObjectInHand extends Component {
         
         var transform = this.gameObject.getComponent(ComponentTransform);
         var pos = transform.getAbsolutePos();
-        ctx.globalAlpha = 0.2;
+        ctx.globalAlpha = 0.4;
         ctx.fillRect(pos.x,pos.y,transform.size.width,transform.size.height);
         ctx.globalAlpha = 1;
+        
+        if(playerInfo.id != this.player) {
+            ctx.drawImage(this.handImg,pos.x,pos.y,transform.size.width,transform.size.height);
+        }
         
         return true;
     }
