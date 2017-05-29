@@ -56,6 +56,7 @@ io.on('connection',function (socket) {
     
     socket.on('updateObject',function (obj) {
         objectList[obj.id] = obj;
+        console.log("Object "+obj.id+" updated");
         socket.broadcast.emit('updateObject',obj); // broadcast to everyone except sender
     });
     

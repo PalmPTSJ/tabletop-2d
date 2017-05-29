@@ -12,7 +12,6 @@ class ComponentImageRendererMulti extends ComponentImageRenderer {
     }
     fromJSON(data) {
         super.fromJSON(data);
-
         if(data.faces !== undefined) this.faces = data.faces;
         if(data.currentFaceIndex !== undefined) this.applyFace(data.currentFaceIndex);
         else this.applyFace(this.currentFaceIndex);

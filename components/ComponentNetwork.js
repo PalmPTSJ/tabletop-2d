@@ -24,6 +24,7 @@ class ComponentNetwork extends Component {
             var nowJSON = JSON.stringify(this.gameObject.toJSON());
             if(nowJSON != this.lastJSON) {
                 this.lastJSON = nowJSON;
+                this.gameObject.fromJSON(this.gameObject.toJSON()); // Force local update
                 socket.emit('updateObject',this.gameObject.toJSON()); // sync gameObject
             }
             this.lastTimestamp = timestamp;
