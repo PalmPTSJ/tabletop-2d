@@ -67,6 +67,12 @@ class EmptyPrefab extends Base {
         }
         return undefined;
     }
+    getEnabledComponent(clazz) {
+        for(var comp of this.components) {
+            if(comp instanceof clazz && comp.isEnabled()) return comp;
+        }
+        return undefined;
+    }
     getComponents(clazz) {
         var toRet = [];
         for(var comp of this.components) {
@@ -79,7 +85,10 @@ class EmptyPrefab extends Base {
         this.components.push(comp);
     }
     deleteComponent(comp) {
-        if(this.components.indexOf(comp) != -1) this.components.splice(this.components.indexOf(comp),1);
+        if(this.components.indexOf(comp) != -1) {
+            comp.onDestroy();
+            this.components.splice(this.components.indexOf(comp),1);
+        }
     }
     
     instantiate() {

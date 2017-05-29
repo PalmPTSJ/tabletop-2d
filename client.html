@@ -26,14 +26,14 @@
 	<body style="padding:0px 50px;">
     
         <div class="row">
-            <div class="col m8" style="">
+            <div class="col s12 m8" style="">
 				<div style="width:100%">
 					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1">
 				
 					</canvas>
 				</div>
             </div>
-            <div class="col m4">
+            <div class="col s12 m4">
                 <div id="">
                     <h4>Console & Debug</h4>
                     <p id="debug"></p>
@@ -71,7 +71,6 @@
     <script src="components/ComponentRectRenderer.js"></script>
     <script src="components/ComponentTextRenderer.js"></script>
     <script src="components/ComponentImageRendererMulti.js"></script>
-    
     <!-- End include components -->
     
 	<script>
@@ -113,9 +112,9 @@
             return ""+playerInfo.id+"_"+(idGenerator++);
         }
 		
-        var ip = prompt("Please enter ip address","127.0.0.1");
+        var ip = prompt("Please enter ip address","127.0.0.1:8080");
         
-		var socket = io('http://'+ip+':8080');
+		var socket = io("ws://"+ip);
         
 		socket.on('log',function (data) {
 			console.log("Server log : ",data);
@@ -171,6 +170,12 @@
 		function update(timestamp) {
             // setup canvas
             ctx.clearRect(0,0,canvas.width,canvas.height);
+            
+            canvas.width = $(canvas.parentNode).innerWidth();
+            canvas.height = canvas.width / (4/3);
+            $(canvas).css("width",canvas.width);
+            $(canvas).css("height",canvas.height);
+        
             ctx.save();
             ctx.translate(  -((canvasX+canvas.width/2)*canvasScale - canvas.width/2),
                             -((canvasY+canvas.height/2)*canvasScale - canvas.height/2));
@@ -202,6 +207,7 @@
 		canvas.addEventListener("mousewheel", mouseWheelHandler, false);
 		canvas.addEventListener("DOMMouseScroll", mouseWheelHandler, false);
         function mouseWheelHandler(e) {
+            e.preventDefault();
             var e = window.event || e; // old IE support
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
             if(delta < 0) {
@@ -228,7 +234,7 @@
                 y : canvasY + canvas.height/2 + (mouseLastPos.y-canvas.height/2)/canvasScale
             }
             for(var obj of selectingObject)
-                if(obj.getComponent(ComponentCursorCollider) && obj.getComponent(ComponentCursorCollider).isOver(clickPos))
+                if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos))
                     mouseLastPos.isMovingObject = true;
         });
         
@@ -262,7 +268,7 @@
                 // click !
                 if(!isKeyDown[16]) selectingObject.clear();
                 for(var obj of objectList) {
-                    if(obj.getComponent(ComponentCursorCollider) && obj.getComponent(ComponentCursorCollider).isOver(clickPos)) {
+                    if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getComponent(ComponentCursorCollider).isOver(clickPos)) {
                         // click on this object
                         selectingObject.add(obj);
                         break;

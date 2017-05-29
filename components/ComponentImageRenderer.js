@@ -23,8 +23,13 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
             return;
         }
         var transform = this.gameObject.getComponent(ComponentTransform);
-        var pos = transform.getAbsolutePos();
-        ctx.drawImage(this.img,pos.x,pos.y,transform.size.width,transform.size.height);
+        if(this.img.complete) {
+            //console.log(this.img)
+            ctx.save();
+            transform.setupCanvas();
+            ctx.drawImage(this.img,0,0,transform.size.width,transform.size.height);
+            ctx.restore();
+        }
     }
     
     applyImage(url) {

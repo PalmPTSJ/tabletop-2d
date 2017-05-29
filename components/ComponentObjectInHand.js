@@ -3,7 +3,7 @@ class ComponentObjectInHand extends Component {
         super("objectInHand");
         this.player = 0;
         this.handImg = new Image;
-        this.handImg.src = "http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/magic-marker-icons-people-things/115757-magic-marker-icon-people-things-hand22-sc48.png";
+        this.handImg.src = "http://icons.iconarchive.com/icons/icons8/ios7/128/Hands-Hand-icon.png";
     }
     
     toJSON() {
@@ -19,18 +19,21 @@ class ComponentObjectInHand extends Component {
         return this;
     }
     
+    onStart() {
+        super.onStart();
+        if(playerInfo.id != this.player && selectingObj.has(this.gameObject)) selectingObj.delete(this.gameObject);
+    }
+    
     onUpdate(timestamp) {
         if(!super.onUpdate(timestamp)) return false;
         
         if(playerInfo.id != this.player) {
-            // disable renderer and cursor collider
-            if(this.gameObject.getComponent(ComponentRenderer))
-                this.gameObject.getComponent(ComponentRenderer).disableForThisFrame();
+            // cursor collider
             if(this.gameObject.getComponent(ComponentCursorCollider))
                 this.gameObject.getComponent(ComponentCursorCollider).disableForThisFrame();
-            
-            
-            
+            this.gameObject.getComponents(ComponentRenderer).forEach((renderer)=>{
+                renderer.disableForThisFrame();
+            });
         }
         
         // draw highlight
@@ -38,22 +41,23 @@ class ComponentObjectInHand extends Component {
         else ctx.fillStyle = "#FA0";
         
         var transform = this.gameObject.getComponent(ComponentTransform);
-        var pos = transform.getAbsolutePos();
+        
+        ctx.save();
+        transform.setupCanvas();
+        
         ctx.globalAlpha = 0.4;
-        ctx.fillRect(pos.x,pos.y,transform.size.width,transform.size.height);
+        ctx.fillRect(0,0,transform.size.width,transform.size.height);
         ctx.globalAlpha = 1;
         
         if(playerInfo.id != this.player) {
-            ctx.drawImage(this.handImg,pos.x,pos.y,transform.size.width,transform.size.height);
+            ctx.drawImage(this.handImg,0,0,transform.size.width,transform.size.height);
         }
+        
+        ctx.restore();
         
         return true;
     }
-    
-    onKeyPress(key) {
-        super.onKeyPress(key);
-        
-    }
+
 }
 
 classList["ComponentObjectInHand"] = ComponentObjectInHand;

@@ -20,6 +20,9 @@ class Component extends Base {
     onStart() {
         
     }
+    onDestroy() {
+        
+    }
     onKeyPress(key) {
         
     }
@@ -32,6 +35,10 @@ class Component extends Base {
     disableForThisFrame() {
         // disable this component for this frame
         this.enabledThisFrame = false;
+    }
+    
+    isEnabled() {
+        return this.enabled && this.enabledThisFrame;
     }
 }
 classList["Component"] = Component;
