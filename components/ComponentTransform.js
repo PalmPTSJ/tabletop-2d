@@ -5,6 +5,7 @@ class ComponentTransform extends Component {
         this.pos = {x:0,y:0,z:0};
         this.size = {width:0,height:0};
         this.rotation = 0; // CW
+        this.lastPos = this.pos;
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
@@ -21,6 +22,16 @@ class ComponentTransform extends Component {
         this.parent = data.parentId==null?null:objectList[data.parentId];
         if(data.rotation !== undefined) this.rotation = data.rotation;
         return this;
+    }
+    
+    onUpdate(timestamp) {
+        if(!super.onUpdate(timestamp)) return false;
+        if(this.lastPos.z != this.pos.z) {
+            // force re-sort object
+            sortObjectList();
+        }
+        this.lastPos = this.pos;
+        return true;
     }
     
     onKeyPress(key) {

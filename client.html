@@ -26,14 +26,14 @@
 	<body style="padding:0px 50px;">
     
         <div class="row">
-            <div class="col s12 m8" style="">
+            <div class="col m12 l8" style="">
 				<div style="width:100%">
 					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1">
 				
 					</canvas>
 				</div>
             </div>
-            <div class="col s12 m4">
+            <div class="col m12 l4">
                 <div id="">
                     <h4>Console & Debug</h4>
                     <p id="debug"></p>
@@ -90,7 +90,7 @@
             }
             return undefined;
         }
-        function sortObjectList() {
+        function sortObjectList() { // Low Z -> High Z
             // sort
             objectList.sort((a,b)=>{
                 var ta = a.getComponent(ComponentTransform);
@@ -267,8 +267,9 @@
                 }
                 // click !
                 if(!isKeyDown[16]) selectingObject.clear();
-                for(var obj of objectList) {
-                    if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getComponent(ComponentCursorCollider).isOver(clickPos)) {
+                for(var i = objectList.length-1;i >= 0;i--) { // Select from high Z to low Z item
+                    var obj = objectList[i];
+                    if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos)) {
                         // click on this object
                         selectingObject.add(obj);
                         break;
