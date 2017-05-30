@@ -22,9 +22,11 @@ class ComponentTextRenderer extends ComponentRenderer {
             return;
         }
         var transform = this.gameObject.getComponent(ComponentTransform);
-        var pos = transform.getAbsolutePos();
+        ctx.save();
+        transform.setupCanvas();
         ctx.font = this.font;
-        ctx.fillText(this.text,pos.x,pos.y);
+        ctx.fillText(this.text,0,0);
+        ctx.restore();
     }
 }
 

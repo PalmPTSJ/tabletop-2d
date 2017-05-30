@@ -19,11 +19,16 @@ class ComponentRectRenderer extends ComponentRenderer { // Render rectangle
             return;
         }
         var transform = this.gameObject.getComponent(ComponentTransform);
-        var pos = transform.getAbsolutePos();
+        
+        ctx.save();
+        transform.setupCanvas();
+        
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.rect(pos.x,pos.y,transform.size.width,transform.size.height);
+        ctx.rect(0,0,transform.size.width,transform.size.height);
         ctx.fill();
+        
+        ctx.restore();
     }
 }
 
