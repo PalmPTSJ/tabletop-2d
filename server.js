@@ -1,5 +1,25 @@
-io = require('socket.io')(8080);
+var app = require('http').createServer(handler)
+  , io = require('socket.io').listen(app)
+  , fs = require('fs');
+
+app.listen( 8080 );
 console.log("Server started");
+
+function handler (req, res) {
+    if(req.url == '/') req.url = '/client.html';
+    //console.log("[HTTP] Request "+(__dirname + req.url));
+    fs.readFile(__dirname + req.url,
+    function (err, data) {
+        if (err) {
+            res.writeHead(500);
+            return res.end('Error loading '+req.url);
+        }
+
+        //res.writeHead(200, {'Content-Type': 'text/html'});
+        res.writeHead(200);
+        res.end(data);
+    });
+}
 
 function log(data) {
 	console.log(data);
@@ -15,7 +35,7 @@ var prefabIdGenerator = 0;
 var playerIdGenerator = 0;
 
 io.on('connection',function (socket) {
-	console.log("New connection from : "+socket);
+	log("New connection from "+socket.request.connection.remoteAddress);
     
     socket.emit('playerInfo',{
         id : playerIdGenerator++

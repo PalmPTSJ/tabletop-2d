@@ -36,8 +36,15 @@
             <div class="col m12 l4">
                 <div id="">
                     <h4>Console & Debug</h4>
-                    <p id="debug"></p>
+                    <p id="debugCanvasPos"></p>
                     <p id="debugFPS"></p>
+                    <div class="input-field">
+                        <textarea id="debugConsole" style="height:150px" readonly></textarea>
+                    </div>
+                    <div class="input-field">
+                        <input type="text" id="consoleInput"></input>
+                        <label class="active" for="consoleInput">Console Input</label>
+                    </div>
                 </div>
 				<div id="prefabListDiv">
 					<h4>Prefab</h4>
@@ -101,6 +108,9 @@
             })
         }
         
+        function log(data) { // log to console
+            $("#debugConsole").html(($("#debugConsole").html()+"\n"+data).substr(-1000)); // last 1000 chars
+        }
         
         var idGenerator = 0;
         function generateNewId() {
@@ -115,9 +125,10 @@
         var ip = prompt("Please enter ip address","127.0.0.1:8080");
         
 		var socket = io("ws://"+ip);
-        
+
 		socket.on('log',function (data) {
 			console.log("Server log : ",data);
+            log(data);
 		});
         
         socket.on('newPrefab',function (data) {
@@ -180,7 +191,7 @@
             ctx.translate(  -((canvasX+canvas.width/2)*canvasScale - canvas.width/2),
                             -((canvasY+canvas.height/2)*canvasScale - canvas.height/2));
             ctx.scale(canvasScale,canvasScale);
-            $("#debug").html("Canvas position = "+Math.floor(canvasX)+","+Math.floor(canvasY)+" (scale "+Math.round(canvasScale*100)/100+")");
+            $("#debugCanvasPos").html("Canvas position = "+Math.floor(canvasX)+","+Math.floor(canvasY)+" (scale "+Math.round(canvasScale*100)/100+")");
             // update every object
 			for(var obj of objectList) obj.update(timestamp);
 			
@@ -276,6 +287,17 @@
                     }
                 }
             }
+        });
+
+        $(document).ready(function(){
+            $('#consoleInput').keypress(function(e){
+                if(e.keyCode==13) {
+                    var cmd = $("#consoleInput").val();
+                    $("#consoleInput").val("");
+                    eval(cmd);
+                }
+                $('#linkadd').click();
+            });
         });
         
         var isKeyDown = {};
