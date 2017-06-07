@@ -134,4 +134,15 @@ class GameObject extends EmptyPrefab {
             if(comp.onKeyPress) comp.onKeyPress(keycode);
         }
     }
+    
+    onObjectDrop(objectList) {
+        for(var comp of this.components) {
+            if(comp.onObjectDrop) comp.onObjectDrop(objectList);
+        }
+    }
+    onDestroy() {
+        for(var comp of this.components) {
+            if(comp.onDestroy) comp.onDestroy();
+        }
+    }
 }

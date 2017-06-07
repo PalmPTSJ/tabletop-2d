@@ -111,7 +111,9 @@
         }
         
         function log(data) { // log to console
-            $("#debugConsole").html(($("#debugConsole").html()+"\n"+data).substr(-1000)); // last 1000 chars
+            var now = new Date();
+            data = ("[" + now.getHours() + ':' + now.getMinutes() + ":" + now.getSeconds() + "] ") + data;
+            $("#debugConsole").html(($("#debugConsole").html()+data+"\n").substr(-1000)); // last 1000 chars
         }
         
         var idGenerator = 0;
@@ -165,6 +167,7 @@
         
         socket.on('deleteObject',function(id) {
             var obj = getObjectFromId(id);
+            obj.onDestroy();
             if(selectingObject.has(obj)) selectingObject.delete(obj);
             objectList.splice(objectList.indexOf(obj));
         });
@@ -273,18 +276,29 @@
         
         canvas.addEventListener("mouseup",function (e) {
             mouseLastPos.down = false;
-            if(mouseLastPos.moveLength <= 5) {
-                var clickPos = {
-                    x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
-                    y : canvasY + canvas.height/2 + (mouseLastPos.y-canvas.height/2)/canvasScale
-                }
-                // click !
+            var clickPos = {
+                x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
+                y : canvasY + canvas.height/2 + (mouseLastPos.y-canvas.height/2)/canvasScale
+            }
+            if(!mouseLastPos.isMovingObject && mouseLastPos.moveLength <= 5) { // click !
                 if(!isKeyDown[16]) selectingObject.clear();
                 for(var i = objectList.length-1;i >= 0;i--) { // Select from high Z to low Z item
                     var obj = objectList[i];
                     if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos)) {
                         // click on this object
                         selectingObject.add(obj);
+                        break;
+                    }
+                }
+            }
+            if(mouseLastPos.isMovingObject) { // drop object
+                // check if drop on top of something
+                for(var i = objectList.length-1;i >= 0;i--) { // Select from high Z to low Z item
+                    var obj = objectList[i];
+                    if(selectingObject.has(obj)) continue;
+                    if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos)) {
+                        // drop item on this obj
+                        obj.onObjectDrop(selectingObject);
                         break;
                     }
                 }

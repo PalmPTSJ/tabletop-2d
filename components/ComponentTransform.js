@@ -42,6 +42,12 @@ class ComponentTransform extends Component {
         if(key == 'e'.charCodeAt(0)) { // (E) = Rotate 15 CW
             this.rotation += 15;
         }
+        if(key == '+'.charCodeAt(0)) { // (+) = Put object over
+            this.pos.z++;
+        }
+        if(key == '-'.charCodeAt(0)) { // (-) = Put object under
+            this.pos.z--;
+        }
         if(this.rotation < 0) this.rotation += 360;
         if(this.rotation >= 360) this.rotation -= 360;
     }

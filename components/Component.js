@@ -28,15 +28,17 @@ class Component extends Base {
     onKeyPress(key) {
         
     }
+    onObjectDrop(objectList) {
+        
+    }
+    
     onUpdate(timestamp) {
-        if(!this.enabled || this.disabledForAFrame || this.disabledTimestamp == timestamp) {
-            this.enabledThisFrame = false;
-        }
-        else {
+        if(this.enabled && !this.disabledForAFrame && this.disabledTimestamp != timestamp) {
             this.enabledThisFrame = true;
-        }
-        if(this.enabledThisFrame && this.disabledTimestamp != timestamp) return true;
-        if(this.disabledTimestamp != timestamp) this.enabledThisFrame = true;
+            return true;
+        } 
+        this.disabledForAFrame = false;
+        this.enabledThisFrame = false;
         return false;
     }
     
@@ -48,7 +50,7 @@ class Component extends Base {
     }
     
     isEnabled() {
-        return this.enabled && this.enabledThisFrame;
+        return this.enabledThisFrame;
     }
 }
 classList["Component"] = Component;
