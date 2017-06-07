@@ -4,6 +4,8 @@ class Component extends Base {
         this.componentName = name;
         this.enabled = true;
         this.enabledThisFrame = true;
+        this.disabledForAFrame = false;
+        this.disabledTimestamp = 0;
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
@@ -27,13 +29,21 @@ class Component extends Base {
         
     }
     onUpdate(timestamp) {
-        if(this.enabled && this.enabledThisFrame) return true;
-        this.enabledThisFrame = true;
+        if(!this.enabled || this.disabledForAFrame || this.disabledTimestamp == timestamp) {
+            this.enabledThisFrame = false;
+        }
+        else {
+            this.enabledThisFrame = true;
+        }
+        if(this.enabledThisFrame && this.disabledTimestamp != timestamp) return true;
+        if(this.disabledTimestamp != timestamp) this.enabledThisFrame = true;
         return false;
     }
     
-    disableForThisFrame() {
+    disableForThisFrame(timestamp) {
         // disable this component for this frame
+        this.disabledForAFrame = true;
+        this.disabledTimestamp = timestamp;
         this.enabledThisFrame = false;
     }
     

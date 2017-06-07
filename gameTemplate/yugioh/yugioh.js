@@ -30,6 +30,18 @@ matPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
 matPrefab.addComponent((new ComponentTextRenderer()).fromJSON({
     text : "Welcome to tabletop 2d! Let's play Yu-Gi-Oh!"
 }));
+socket.emit('createPrefab',matPrefab.toJSON());
+
+var deckPrefab = new Prefab("Deck Holder");
+deckPrefab.getComponent(ComponentTransform).fromJSON({
+    pos     : {x:0,y:0,z:0},
+    size    : {width:60,height:100}
+});
+deckPrefab.addComponent(new ComponentObjectStack());
+deckPrefab.addComponent(new ComponentCursorCollider());
+socket.emit('createPrefab',deckPrefab.toJSON());
+
+
 
 function createCardPrefab(cardImg,cardName) {
     var card = new Prefab(cardName);
@@ -45,7 +57,6 @@ function createCardPrefab(cardImg,cardName) {
 }
 
 // create object
-socket.emit('createPrefab',matPrefab.toJSON());
 socket.emit('createPrefab',createCardPrefab(imageData.card_decodeTalker,"Card - Decode Talker").toJSON());
 socket.emit('createPrefab',createCardPrefab(imageData.card_linkSpider,"Card - Link Spider").toJSON());
 socket.emit('createPrefab',createCardPrefab(imageData.card_proxyDragon,"Card - Proxy Dragon").toJSON());

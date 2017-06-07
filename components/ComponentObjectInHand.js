@@ -30,9 +30,9 @@ class ComponentObjectInHand extends Component {
         if(playerInfo.id != this.player) {
             // cursor collider
             if(this.gameObject.getComponent(ComponentCursorCollider))
-                this.gameObject.getComponent(ComponentCursorCollider).disableForThisFrame();
+                this.gameObject.getComponent(ComponentCursorCollider).disableForThisFrame(timestamp);
             this.gameObject.getComponents(ComponentRenderer).forEach((renderer)=>{
-                renderer.disableForThisFrame();
+                renderer.disableForThisFrame(timestamp);
             });
         }
         

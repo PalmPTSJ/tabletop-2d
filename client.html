@@ -70,6 +70,7 @@
     
     <script src="components/ComponentTabletopObject.js"></script>
     <script src="components/ComponentObjectInHand.js"></script>
+    <script src="components/ComponentObjectStack.js"></script>
     
     <script src="components/ComponentCursorCollider.js"></script>
     
@@ -99,6 +100,7 @@
         }
         function sortObjectList() { // Low Z -> High Z
             // sort
+            console.log("Sort object")
             objectList.sort((a,b)=>{
                 var ta = a.getComponent(ComponentTransform);
                 var tb = b.getComponent(ComponentTransform);

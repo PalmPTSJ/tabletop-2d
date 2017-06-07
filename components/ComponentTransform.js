@@ -3,6 +3,7 @@ class ComponentTransform extends Component {
         super("transform");
         this.parent = null;
         this.pos = {x:0,y:0,z:0};
+        this.lastPos = this.pos;
         this.size = {width:0,height:0};
         this.rotation = 0; // CW
     }
@@ -16,12 +17,8 @@ class ComponentTransform extends Component {
     }
     fromJSON(data) {
         super.fromJSON(data);
-        if(data.pos !== undefined) {
-            if(data.pos.z != this.pos.z) { // force re-sort object
-                sortObjectList();
-            }
-            this.pos = data.pos;
-        }
+        
+        if(data.pos !== undefined) this.pos = data.pos;
         if(data.size !== undefined) this.size = data.size;
         this.parent = data.parentId==null?null:objectList[data.parentId];
         if(data.rotation !== undefined) this.rotation = data.rotation;
@@ -30,6 +27,10 @@ class ComponentTransform extends Component {
     
     onUpdate(timestamp) {
         if(!super.onUpdate(timestamp)) return false;
+        if(this.lastPos.z != this.pos.z) {
+            sortObjectList();
+        }
+        this.lastPos = this.pos;
         return true;
     }
     
