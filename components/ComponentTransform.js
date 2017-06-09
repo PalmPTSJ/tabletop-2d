@@ -48,6 +48,7 @@ class ComponentTransform extends Component {
         if(key == '-'.charCodeAt(0)) { // (-) = Put object under
             this.pos.z--;
         }
+        
         if(this.rotation < 0) this.rotation += 360;
         if(this.rotation >= 360) this.rotation -= 360;
     }
@@ -60,10 +61,17 @@ class ComponentTransform extends Component {
         else return this.pos;
     }
     
+    onUpdate(timestamp) {
+        if(!super.onUpdate(timestamp)) return false;
+        //this.rotation = this.localRotation + globalRotation;
+        return true;
+    }
+    
     setupCanvas() { // set canvas to match this (position , rotation)
         if(this.parent != null) this.parent.getComponent(ComponentTransform).setupCanvas(); // setup from parent first
-        ctx.translate(this.pos.x,this.pos.y);
+        ctx.translate(this.pos.x + this.size.width/2,this.pos.y + this.size.height/2);
         ctx.rotate(this.rotation*Math.PI/180);
+        ctx.translate(-this.size.width/2,-this.size.height/2);
     }
 }
 

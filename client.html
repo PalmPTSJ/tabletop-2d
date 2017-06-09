@@ -45,6 +45,7 @@
                         <input type="text" id="consoleInput"></input>
                         <label class="active" for="consoleInput">Console Input</label>
                     </div>
+                    
                 </div>
 				<div id="prefabListDiv">
 					<h4>Prefab</h4>
@@ -82,6 +83,26 @@
     <!-- End include components -->
     
 	<script>
+        /// Debug function / Temp function
+        var fpsCount = 0;
+        function log(data) { // log to console
+            var now = new Date();
+            data = ("[" + now.getHours() + ':' + now.getMinutes() + ":" + now.getSeconds() + "] ") + data;
+            $("#debugConsole").html(($("#debugConsole").html()+data+"\n").substr(-1000)); // last 1000 chars
+        }
+        window.setInterval(()=>{
+            $("#debugFPS").html("FPS : "+fpsCount);
+            fpsCount = 0;
+        },1000);
+        
+        var flip = false;
+        var globalRotation = 0;
+        function setGlobalRotation(angle) {
+            globalRotation = angle;
+            log("Global rotation set to : "+globalRotation);
+        }
+        
+        /// Object
 		var canvas = document.getElementById("gameCanvas");
 		var ctx = canvas.getContext("2d");
 		
@@ -89,9 +110,7 @@
         var prefabList = {};
         
         var playerInfo = {};
-        
-        var fpsCount = 0;
-        
+
         function getObjectFromId(id) {
             for(var obj of objectList) {
                 if(obj.id == id) return obj;
@@ -99,8 +118,6 @@
             return undefined;
         }
         function sortObjectList() { // Low Z -> High Z
-            // sort
-            console.log("Sort object")
             objectList.sort((a,b)=>{
                 var ta = a.getComponent(ComponentTransform);
                 var tb = b.getComponent(ComponentTransform);
@@ -109,13 +126,6 @@
                 return 1;
             })
         }
-        
-        function log(data) { // log to console
-            var now = new Date();
-            data = ("[" + now.getHours() + ':' + now.getMinutes() + ":" + now.getSeconds() + "] ") + data;
-            $("#debugConsole").html(($("#debugConsole").html()+data+"\n").substr(-1000)); // last 1000 chars
-        }
-        
         var idGenerator = 0;
         function generateNewId() {
             // generate new id in form [Player id]_[Int]
@@ -125,9 +135,9 @@
             }
             return ""+playerInfo.id+"_"+(idGenerator++);
         }
-		
+
+        /// Socket events
         var ip = prompt("Please enter ip address","127.0.0.1:8080");
-        
 		var socket = io("ws://"+ip);
 
 		socket.on('log',function (data) {
@@ -196,6 +206,7 @@
             ctx.translate(  -((canvasX+canvas.width/2)*canvasScale - canvas.width/2),
                             -((canvasY+canvas.height/2)*canvasScale - canvas.height/2));
             ctx.scale(canvasScale,canvasScale);
+            ctx.rotate(this.globalRotation*Math.PI/180);
             $("#debugCanvasPos").html("Canvas position = "+Math.floor(canvasX)+","+Math.floor(canvasY)+" (scale "+Math.round(canvasScale*100)/100+")");
             // update every object
 			for(var obj of objectList) obj.update(timestamp);
@@ -258,10 +269,11 @@
             if(!mouseLastPos.down) return;
             var offX = e.pageX - $(canvas).offset().left - mouseLastPos.x;
             var offY = e.pageY - $(canvas).offset().top - mouseLastPos.y;
+            // rotate offX , offY with globalRotation
             if(mouseLastPos.isMovingObject) {
                 for(var obj of selectingObject) {
-                    obj.getComponent(ComponentTransform).pos.x += offX / canvasScale;
-                    obj.getComponent(ComponentTransform).pos.y += offY / canvasScale;
+                    obj.getComponent(ComponentTransform).pos.x += (Math.cos(globalRotation * Math.PI / 180)*offX + Math.sin(globalRotation * Math.PI / 180)*offY) / canvasScale;
+                    obj.getComponent(ComponentTransform).pos.y += (- Math.sin(globalRotation * Math.PI / 180)*offX + Math.cos(globalRotation * Math.PI / 180)*offY) / canvasScale;
                 }
             }
             else {
@@ -317,32 +329,23 @@
         });
         
         var isKeyDown = {};
-        
         canvas.addEventListener("keydown",function (e) {
             e = e || window.event; 
             var charCode = e.charCode || e.keyCode;
             isKeyDown[charCode] = true;
         });
-        
         canvas.addEventListener("keyup",function (e) {
             e = e || window.event; 
             var charCode = e.charCode || e.keyCode;
             isKeyDown[charCode] = false;
         });
-        
         canvas.addEventListener("keypress",function (e) {
             e = e || window.event; 
             var charCode = e.charCode || e.keyCode;
-            // call boardGameObject.keyPress
             for(var obj of selectingObject) {
                 obj.onKeyPress(charCode);
             }
         });
-        
-        window.setInterval(()=>{
-            $("#debugFPS").html("FPS : "+fpsCount);
-            fpsCount = 0;
-        },1000);
 	
 	</script>
 </html>

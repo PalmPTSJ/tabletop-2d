@@ -8,10 +8,7 @@ var imageData = {
     card_decodeTalker : "https://pre12.deviantart.net/460b/th/pre/f/2017/049/5/d/decode_talker_yugioh_by_yeidenex-dazisnk.png",
     card_linkSpider : "http://orig03.deviantart.net/cbd2/f/2017/049/7/b/link_spider_yugioh_by_yeidenex-dazj7fm.png",
     card_proxyDragon : "http://orig14.deviantart.net/2d1e/f/2017/096/2/b/proxy_dragon_yugioh_ocg_by_yeidenex-db4wuux.png",
-    
-    card_jerryBeansMan : "https://vignette2.wikia.nocookie.net/yugioh/images/e/e9/JerryBeansMan-BP03-EN-C-1E.png/revision/latest?cb=20140801084200",
-    card_masterKyonshee : "http://vignette3.wikia.nocookie.net/yugioh/images/4/4e/MasterKyonshee-SDZW-EN-C-1E.png/revision/latest?cb=20160414193718",
-    
+
     card_scapegoat : "http://vignette1.wikia.nocookie.net/yugioh/images/2/24/Scapegoat-LDK2-EN-C-1E.png/revision/latest?cb=20161007083843",
     card_mirrorForce : "http://vignette4.wikia.nocookie.net/yugioh/images/0/0a/MirrorForce-SDMY-EN-C-1E.png/revision/latest?cb=20161021200533",
     
@@ -41,8 +38,6 @@ deckPrefab.addComponent(new ComponentObjectStack());
 deckPrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',deckPrefab.toJSON());
 
-
-
 function createCardPrefab(cardImg,cardName) {
     var card = new Prefab(cardName);
     card.getComponent(ComponentTransform).fromJSON({
@@ -53,12 +48,18 @@ function createCardPrefab(cardImg,cardName) {
         faces : [cardImg,imageData.cardBack]
     }));
     card.addComponent(new ComponentCursorCollider());
+    socket.emit('createPrefab',card.toJSON());
     return card;
 }
 
 // create object
-socket.emit('createPrefab',createCardPrefab(imageData.card_decodeTalker,"Card - Decode Talker").toJSON());
-socket.emit('createPrefab',createCardPrefab(imageData.card_linkSpider,"Card - Link Spider").toJSON());
-socket.emit('createPrefab',createCardPrefab(imageData.card_proxyDragon,"Card - Proxy Dragon").toJSON());
-socket.emit('createPrefab',createCardPrefab(imageData.card_scapegoat,"Card - Scapegoat").toJSON());
-socket.emit('createPrefab',createCardPrefab(imageData.card_mirrorForce,"Card - Mirror Force").toJSON());
+createCardPrefab(imageData.card_decodeTalker,"Card - Decode Talker");
+createCardPrefab(imageData.card_linkSpider,"Card - Link Spider");
+createCardPrefab(imageData.card_proxyDragon,"Card - Proxy Dragon");
+
+createCardPrefab(imageData.card_scapegoat,"Card - Scapegoat");
+createCardPrefab(imageData.card_mirrorForce,"Card - Mirror Force");
+
+createCardPrefab('https://vignette2.wikia.nocookie.net/yugioh/images/8/8c/Bitron-ST17-JP-NPR.png/revision/latest?cb=20170324150258','Card - Bitron');
+createCardPrefab('http://orig00.deviantart.net/ae4c/f/2017/137/2/8/draconnet_by_alanmac95-db3e2ue.png','Card - Draconnet');
+createCardPrefab('http://pre00.deviantart.net/7e68/th/pre/f/2017/052/4/7/link_slayer_yugioh_by_yeidenex-dazw4a5.png','Card - Link Slayer');
