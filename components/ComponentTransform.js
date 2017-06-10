@@ -3,7 +3,7 @@ class ComponentTransform extends Component {
         super("transform");
         this.parent = null;
         this.pos = {x:0,y:0,z:0};
-        this.lastPos = this.pos;
+        this.lastPos = {x:0,y:0,z:0};
         this.size = {width:0,height:0};
         this.rotation = 0; // CW
     }
@@ -30,7 +30,11 @@ class ComponentTransform extends Component {
         if(this.lastPos.z != this.pos.z) {
             sortObjectList();
         }
-        this.lastPos = this.pos;
+        this.lastPos = {
+            x:this.pos.x,
+            y:this.pos.y,
+            z:this.pos.z
+        }
         return true;
     }
     
@@ -42,10 +46,10 @@ class ComponentTransform extends Component {
         if(key == 'e'.charCodeAt(0)) { // (E) = Rotate 15 CW
             this.rotation += 15;
         }
-        if(key == '+'.charCodeAt(0)) { // (+) = Put object over
+        if(key == 'x'.charCodeAt(0)) { // (x) = Put object over
             this.pos.z++;
         }
-        if(key == '-'.charCodeAt(0)) { // (-) = Put object under
+        if(key == 'z'.charCodeAt(0)) { // (z) = Put object under
             this.pos.z--;
         }
         
@@ -59,12 +63,6 @@ class ComponentTransform extends Component {
             return {x:pos.x+this.pos.x,y:pos.y+this.pos.y,z:pos.z + this.pos.z};
         }
         else return this.pos;
-    }
-    
-    onUpdate(timestamp) {
-        if(!super.onUpdate(timestamp)) return false;
-        //this.rotation = this.localRotation + globalRotation;
-        return true;
     }
     
     setupCanvas() { // set canvas to match this (position , rotation)

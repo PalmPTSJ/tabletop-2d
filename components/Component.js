@@ -41,6 +41,15 @@ class Component extends Base {
         this.enabledThisFrame = false;
         return false;
     }
+    onServerUpdate(timestamp) {
+        if(this.enabled && !this.disabledForAFrame && this.disabledTimestamp != timestamp) {
+            this.enabledThisFrame = true;
+            return true;
+        } 
+        this.disabledForAFrame = false;
+        this.enabledThisFrame = false;
+        return false;
+    }
     
     disableForThisFrame(timestamp) {
         // disable this component for this frame

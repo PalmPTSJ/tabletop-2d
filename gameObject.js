@@ -123,6 +123,11 @@ class GameObject extends EmptyPrefab {
             comp.onUpdate(timestamp);
         }
     }
+    serverUpdate() {
+        for(var comp of this.components) {
+            comp.onServerUpdate();
+        }
+    }
     
     addComponent(comp) {
         super.addComponent(comp);

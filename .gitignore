@@ -1,3 +1,4 @@
 node_modules
 workspace
 gameTemplate/*/resources
+npm-debug.log

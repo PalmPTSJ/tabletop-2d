@@ -31,6 +31,11 @@ class ComponentNetwork extends Component {
         }
         return true;
     }
+    onServerUpdate(timestamp) {
+        if(!super.onServerUpdate(timestamp)) return false;
+        this.onUpdate(timestamp);
+        return true;
+    }
 }
 
 classList["ComponentNetwork"] = ComponentNetwork;

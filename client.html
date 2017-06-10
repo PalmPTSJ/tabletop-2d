@@ -83,6 +83,7 @@
     <!-- End include components -->
     
 	<script>
+        var isServer = false;
         /// Debug function / Temp function
         var fpsCount = 0;
         function log(data) { // log to console
@@ -172,7 +173,7 @@
         socket.on('updateObject',function(data) {
             // update object of that id
             getObjectFromId(data.id).getComponent(ComponentNetwork).onNetworkUpdate(data);
-            sortObjectList();
+            //sortObjectList();
         });
         
         socket.on('deleteObject',function(id) {

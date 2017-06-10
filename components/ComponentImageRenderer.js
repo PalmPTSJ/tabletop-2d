@@ -34,7 +34,7 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
     
     applyImage(url) {
         this.url = url;
-        
+        if(isServer) return;
         this.img = new Image;
         if(this.url) this.img.src = this.url;
         

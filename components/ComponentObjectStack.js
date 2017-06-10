@@ -71,7 +71,7 @@ class ComponentObjectStack extends Component {
             if(getObjectFromId(id) !== undefined) newStackListId.push(id);
         }
         this.stackListId = newStackListId;
-        this.updateTopOfStack();
+        //this.updateTopOfStack();
         
         let transform = this.gameObject.getComponent(ComponentTransform);
         
@@ -102,6 +102,12 @@ class ComponentObjectStack extends Component {
         
     }
     
+    onServerUpdate(timestamp) {
+        if(!super.onServerUpdate(timestamp)) return false;
+        this.updateTopOfStack();
+        return true;
+    }
+    
     addToStack(obj) {
         // put object on top of stack
         console.log("Add to stack "+obj.id);
@@ -112,7 +118,9 @@ class ComponentObjectStack extends Component {
     shuffle() {
         for (let i = this.stackListId.length; i; i--) {
             let j = Math.floor(Math.random() * i);
-            [this.stackListId[i - 1], this.stackListId[j]] = [this.stackListId[j], this.stackListId[i - 1]];
+            var tmp = this.stackListId[j];
+            this.stackListId[j] = this.stackListId[i - 1];
+            this.stackListId[i - 1] = tmp;
         }
     }
     
