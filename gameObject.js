@@ -144,6 +144,11 @@ class GameObject extends EmptyPrefab {
         for(var comp of this.components) {
             if(comp.onKeyPress) comp.onKeyPress(keycode);
         }
+        
+        if(keycode == 'c'.charCodeAt(0)) {
+            // copy
+            socket.emit('createObject',this.toJSON());
+        }
     }
     
     onObjectDrop(objectList) {

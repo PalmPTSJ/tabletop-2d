@@ -63,3 +63,12 @@ createCardPrefab(imageData.card_mirrorForce,"Card - Mirror Force");
 createCardPrefab('https://vignette2.wikia.nocookie.net/yugioh/images/8/8c/Bitron-ST17-JP-NPR.png/revision/latest?cb=20170324150258','Card - Bitron');
 createCardPrefab('http://orig00.deviantart.net/ae4c/f/2017/137/2/8/draconnet_by_alanmac95-db3e2ue.png','Card - Draconnet');
 createCardPrefab('http://pre00.deviantart.net/7e68/th/pre/f/2017/052/4/7/link_slayer_yugioh_by_yeidenex-dazw4a5.png','Card - Link Slayer');
+
+// C9 cards
+createCardPrefab('http://untitled-palmptsj.c9.io:8080/gameTemplate/yugioh/resources/backupSecretary.png','Card - Backup Secretary');
+createCardPrefab('http://untitled-palmptsj.c9.io:8080/gameTemplate/yugioh/resources/cyberseAnnihilation.png','Card - Cyberse Annihilation');
+createCardPrefab('http://untitled-palmptsj.c9.io:8080/gameTemplate/yugioh/resources/cyberseBeacon.png','Card - Cyberse Beacon');
+createCardPrefab('http://untitled-palmptsj.c9.io:8080/gameTemplate/yugioh/resources/cyberseWizard.png','Card - Cyberse Wizard');
+createCardPrefab('http://untitled-palmptsj.c9.io:8080/gameTemplate/yugioh/resources/stackReviver.png','Card - Stack Reviver');
+createCardPrefab('http://untitled-palmptsj.c9.io:8080/gameTemplate/yugioh/resources/threeStrikesBarrier.png','Card - Three Strikes Barrier');
+

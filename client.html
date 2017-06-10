@@ -180,7 +180,7 @@
             var obj = getObjectFromId(id);
             obj.destroy();
             if(selectingObject.has(obj)) selectingObject.delete(obj);
-            objectList.splice(objectList.indexOf(obj));
+            objectList.splice(objectList.indexOf(obj),1);
         });
         
         socket.on('playerInfo',function(data) {
