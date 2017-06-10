@@ -19,7 +19,7 @@ class ComponentObjectStack extends Component {
         return this;
     }
     
-    breakStack() {
+    RPC_breakStack(params) {
         // break into square
         let colCount = Math.ceil(Math.sqrt(this.stackListId.length));
         console.log("Break stack into "+colCount);
@@ -42,7 +42,9 @@ class ComponentObjectStack extends Component {
     }
     
     onDestroy() {
-        this.breakStack();
+        if(isServer) {
+            this.RPC_breakStack();
+        }
     }
     
     updateTopOfStack() {
@@ -131,26 +133,28 @@ class ComponentObjectStack extends Component {
         }
     }
     
+    RPC_draw(params) {
+        if(this.stackListId.length == 0) return;
+        let obj = getObjectFromId(this.stackListId[0]);
+        let transform = this.gameObject.getComponent(ComponentTransform);
+        if(obj.getComponent(ComponentTransform)) {
+            obj.getComponent(ComponentTransform).pos = {
+                x : transform.pos.x+transform.size.width+10,
+                y : transform.pos.y,
+                z : transform.pos.z+1
+            }
+        }
+        this.stackListId.splice(0, 1);
+        this.updateTopOfStack();
+    }
+    
     onKeyPress(key) {
         super.onKeyPress(key);
         if(key == 'd'.charCodeAt(0)) { // (D) = Draw , Slice object 0 out of stack 
-            if(this.stackListId.length > 0) {
-                // Put that object beside of the stack
-                let obj = getObjectFromId(this.stackListId[0]);
-                let transform = this.gameObject.getComponent(ComponentTransform);
-                if(obj.getComponent(ComponentTransform)) {
-                    obj.getComponent(ComponentTransform).pos = {
-                        x : transform.pos.x+transform.size.width+10,
-                        y : transform.pos.y,
-                        z : transform.pos.z+1
-                    }
-                }
-                this.stackListId.splice(0, 1);
-                this.updateTopOfStack();
-            }
+            this.callRPC('RPC_draw',{});
         }
         if(key == 'b'.charCodeAt(0)) { // (B) = Break deck
-            this.breakStack();
+            this.callRPC('RPC_breakStack',{});
         }
         if(key == 's'.charCodeAt(0)) { // (S) = Shuffle
             this.shuffle();

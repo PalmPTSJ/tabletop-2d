@@ -1,3 +1,4 @@
+"use strict"
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs');
@@ -90,14 +91,24 @@ io.on('connection',function (socket) {
 	});
     
     socket.on('updateObject',function (data) {
-        //console.log(data);
-        //objectList[data.id] = data;
         //console.log("Object "+data.id+" updated");
         objectList[data.id].getComponent(ComponentNetwork).onNetworkUpdate(data);
         socket.broadcast.emit('updateObject',data); // broadcast to everyone except sender
     });
     
+    socket.on('callRPC',function(data) {
+        var obj = objectList[data.objId];
+        if(obj === undefined) return;
+        for(var comp of obj.components) {
+            if(comp.id == data.compId) {
+                comp.callRPC(data.func,data.params);
+                break;
+            }
+        }
+    });
+    
     socket.on('deleteObject',function (id) {
+        objectList[id].destroy();
         delete objectList[id];
         io.emit('deleteObject',id);
     });

@@ -41,6 +41,7 @@ class Component extends Base {
         this.enabledThisFrame = false;
         return false;
     }
+    
     onServerUpdate(timestamp) {
         if(this.enabled && !this.disabledForAFrame && this.disabledTimestamp != timestamp) {
             this.enabledThisFrame = true;
@@ -49,6 +50,22 @@ class Component extends Base {
         this.disabledForAFrame = false;
         this.enabledThisFrame = false;
         return false;
+    }
+    
+    callRPC(func,params) {
+        // issue func call on server with params
+        if(isServer) {
+            console.log("RPC TARG : ",this.componentName,this);
+            this[func](params);
+        }
+        else {
+            socket.emit('callRPC',{
+                objId   : this.gameObject.id,
+                compId  : this.id,
+                func    : func,
+                params  : params
+            });
+        }
     }
     
     disableForThisFrame(timestamp) {

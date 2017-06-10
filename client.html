@@ -178,7 +178,7 @@
         
         socket.on('deleteObject',function(id) {
             var obj = getObjectFromId(id);
-            obj.onDestroy();
+            obj.destroy();
             if(selectingObject.has(obj)) selectingObject.delete(obj);
             objectList.splice(objectList.indexOf(obj));
         });

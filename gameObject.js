@@ -47,6 +47,7 @@ class EmptyPrefab extends Base {
                 }
             }
             if(!updated) {
+                console.log("Created new component : ",comp.className);
                 // create new component
                 var newComp = new (classList[comp.className])();
                 newComp.fromJSON(comp);
@@ -128,6 +129,11 @@ class GameObject extends EmptyPrefab {
             comp.onServerUpdate();
         }
     }
+    destroy() {
+        for(var comp of this.components) {
+            if(comp.onDestroy) comp.onDestroy();
+        }
+    }
     
     addComponent(comp) {
         super.addComponent(comp);
@@ -145,9 +151,5 @@ class GameObject extends EmptyPrefab {
             if(comp.onObjectDrop) comp.onObjectDrop(objectList);
         }
     }
-    onDestroy() {
-        for(var comp of this.components) {
-            if(comp.onDestroy) comp.onDestroy();
-        }
-    }
+    
 }
