@@ -249,6 +249,7 @@
         var selectingObject = new Set();
         canvas.addEventListener("mousedown",function (e) {
             e.preventDefault();
+            canvas.focus();
             mouseLastPos = {
                 x           : e.pageX - $(canvas).offset().left,
                 y           : e.pageY - $(canvas).offset().top,
@@ -267,7 +268,6 @@
         });
         
         canvas.addEventListener("mousemove",function (e) {
-            e.preventDefault();
             if(!mouseLastPos.down) return;
             var offX = e.pageX - $(canvas).offset().left - mouseLastPos.x;
             var offY = e.pageY - $(canvas).offset().top - mouseLastPos.y;
@@ -289,7 +289,6 @@
         });
         
         canvas.addEventListener("mouseup",function (e) {
-            e.preventDefault();
             mouseLastPos.down = false;
             var clickPos = {
                 x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
