@@ -29,8 +29,9 @@ class ComponentObjectInHand extends Component {
         
         if(playerInfo.id != this.player) {
             // cursor collider
-            if(this.gameObject.getComponent(ComponentCursorCollider))
-                this.gameObject.getComponent(ComponentCursorCollider).disableForThisFrame(timestamp);
+            this.gameObject.getComponents(ComponentCursorCollider).forEach((comp)=>{
+                comp.disableForThisFrame(timestamp);
+            })
             this.gameObject.getComponents(ComponentRenderer).forEach((renderer)=>{
                 renderer.disableForThisFrame(timestamp);
             });
@@ -40,7 +41,7 @@ class ComponentObjectInHand extends Component {
         if(playerInfo.id == this.player) ctx.fillStyle = "#8FF";
         else ctx.fillStyle = "#FA0";
         
-        var transform = this.gameObject.getComponent(ComponentTransform);
+        var transform = this.gameObject.getEnabledComponent(ComponentTransform);
         
         ctx.save();
         transform.setupCanvas();

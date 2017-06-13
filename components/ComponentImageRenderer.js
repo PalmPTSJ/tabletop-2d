@@ -14,17 +14,14 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
     }
     
     render() {
-        if(!this.gameObject.getComponent(ComponentTransform)) {
-            //console.log("[ImageRenderer] can't find transform");
+        if(!this.gameObject.getEnabledComponent(ComponentTransform)) {
             return;
         }
         if(!this.url || !this.img) {
-            //console.log("[ImageRenderer] can't load image");
             return;
         }
-        var transform = this.gameObject.getComponent(ComponentTransform);
+        var transform = this.gameObject.getEnabledComponent(ComponentTransform);
         if(this.img.complete) {
-            //console.log(this.img)
             ctx.save();
             transform.setupCanvas();
             ctx.drawImage(this.img,0,0,transform.size.width,transform.size.height);

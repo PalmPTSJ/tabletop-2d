@@ -4,7 +4,7 @@ class ComponentCursorCollider extends Component { // This component allow cursor
     }
     isOver(cursorPos) {
         // check hit with point
-        var transform = this.gameObject.getComponent(ComponentTransform);
+        var transform = this.gameObject.getEnabledComponent(ComponentTransform);
         var pos = transform.getAbsolutePos();
         // rotate point back from globalRotation
         var newCursorPos = {
@@ -30,7 +30,7 @@ class ComponentCursorCollider extends Component { // This component allow cursor
         if(!super.onUpdate(timestamp)) return false;
         if(selectingObject.has(this.gameObject)) {
             // draw outline
-            var transform = this.gameObject.getComponent(ComponentTransform);
+            var transform = this.gameObject.getEnabledComponent(ComponentTransform);
             ctx.save();
             transform.setupCanvas();
             ctx.strokeStyle = "#8CF";

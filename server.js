@@ -8,15 +8,12 @@ console.log("Server started");
 
 function handler (req, res) {
     if(req.url == '/') req.url = '/client.html';
-    //console.log("[HTTP] Request "+(__dirname + req.url));
     fs.readFile(__dirname + req.url,
     function (err, data) {
         if (err) {
             res.writeHead(500);
             return res.end('Error loading '+req.url);
         }
-
-        //res.writeHead(200, {'Content-Type': 'text/html'});
         res.writeHead(200);
         res.end(data);
     });
@@ -47,7 +44,9 @@ global.getObjectFromId = function(id) {
 global.Image = class {
     constructor() {this.src = undefined;}
 };
-console.log("READY !");
+global.socket = io;
+
+console.log("Server ready !");
 io.on('connection',function (socket) {
 	log("New connection from "+socket.request.connection.remoteAddress);
     
@@ -56,11 +55,11 @@ io.on('connection',function (socket) {
     });
     
     // send all object and prefab
-    for(var prefab in prefabList) {
-        socket.emit('newPrefab',prefabList[prefab]);
+    for(var id in prefabList) {
+        socket.emit('newPrefab',prefabList[id]);
     }
-    for(var obj in objectList) {
-        socket.emit('newObject',objectList[obj]);
+    for(var id in objectList) {
+        socket.emit('newObject',objectList[id]);
     }
     
 	socket.on('setName',function (name) {
@@ -72,33 +71,37 @@ io.on('connection',function (socket) {
 	});
 	
 	socket.on('createPrefab',function (prefab) {
-        console.log("New prefab created");
-		var id = "SP_"+(prefabIdGenerator++);
-		prefab.id = id;
-		prefabList[id] = prefab;
+        if(prefab.id == null) {
+            var id = "SP_"+(prefabIdGenerator++);
+            prefab.id = id;
+        }
+        console.log("New prefab "+prefab.id+" created");
+        prefabList[id] = prefab;
+        
 		io.emit('newPrefab',prefab);
 	});
 	
 	socket.on('createObject',function (data) {
-        var id = "SO_"+(objectIdGenerator++);
-        console.log("New object id "+id+" created");
+        if(data.id == null) {
+            var id = "SO_"+(objectIdGenerator++);
+            data.id = id;
+        }
+        console.log("New object "+id+" created");
         var obj = new GameObject();
-		// create object from prefab
-        data.id = id;
         obj.fromJSON(data);
 		objectList[id] = obj;
+        
 		io.emit('newObject',data);
 	});
     
     socket.on('updateObject',function (data) {
-        //console.log("Object "+data.id+" updated");
-        objectList[data.id].getComponent(ComponentNetwork).onNetworkUpdate(data);
+        objectList[data.id].getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
         socket.broadcast.emit('updateObject',data); // broadcast to everyone except sender
     });
     
     socket.on('callRPC',function(data) {
         var obj = objectList[data.objId];
-        if(obj === undefined) return;
+        if(obj == undefined) return;
         for(var comp of obj.components) {
             if(comp.id == data.compId) {
                 comp.callRPC(data.func,data.params);
@@ -112,9 +115,8 @@ io.on('connection',function (socket) {
         delete objectList[id];
         io.emit('deleteObject',id);
     });
-	
 });
-global.socket = io;
+
 function update() {
     var timestamp = Date.now();
     for(var id in objectList) {

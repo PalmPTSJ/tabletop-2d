@@ -22,19 +22,19 @@ class ComponentObjectStack extends Component {
     RPC_breakStack(params) {
         // break into square
         let colCount = Math.ceil(Math.sqrt(this.stackListId.length));
-        console.log("Break stack into "+colCount);
         let i = 0;
-        let transform = this.gameObject.getComponent(ComponentTransform);
+        let transform = this.gameObject.getEnabledComponent(ComponentTransform);
         for(let id of this.stackListId) {
             let obj = getObjectFromId(id);
-            if(obj.getComponent(ComponentTransform)) {
-                obj.getComponent(ComponentTransform).pos = {
+            let objTransform = obj.getEnabledComponent(ComponentTransform);
+            if(objTransform) {
+                objTransform.pos = {
                     x : transform.pos.x + (transform.size.width+10)*((i%colCount) + 1),
                     y : transform.pos.y + (transform.size.height+10)*(Math.floor(i/colCount)),
                     z : transform.pos.z
                 }
-                obj.getComponent(ComponentTransform).rotation = transform.rotation;
-                obj.getComponent(ComponentTransform).size = transform.size;
+                objTransform.rotation = transform.rotation;
+                objTransform.size = transform.size;
             }
             i++;
         }
@@ -49,16 +49,17 @@ class ComponentObjectStack extends Component {
     
     updateTopOfStack() {
         if(this.stackListId.length > 0) {
-            let transform = this.gameObject.getComponent(ComponentTransform);
+            let transform = this.gameObject.getEnabledComponent(ComponentTransform);
             let obj = getObjectFromId(this.stackListId[0]);
-            if(obj.getComponent(ComponentTransform)) {
-                obj.getComponent(ComponentTransform).pos = {
+            let objTransform = obj.getEnabledComponent(ComponentTransform);
+            if(objTransform) {
+                objTransform.pos = {
                     x : transform.pos.x,
                     y : transform.pos.y,
                     z : transform.pos.z-1
                 }
-                obj.getComponent(ComponentTransform).rotation = transform.rotation;
-                obj.getComponent(ComponentTransform).size = transform.size;
+                objTransform.rotation = transform.rotation;
+                objTransform.size = transform.size;
             
             }
         }
@@ -70,18 +71,18 @@ class ComponentObjectStack extends Component {
         // remove invalid id
         let newStackListId = [];
         for(let id of this.stackListId) {
-            if(getObjectFromId(id) !== undefined) newStackListId.push(id);
+            if(getObjectFromId(id) != null) newStackListId.push(id);
         }
         this.stackListId = newStackListId;
         //this.updateTopOfStack();
         
-        let transform = this.gameObject.getComponent(ComponentTransform);
+        let transform = this.gameObject.getEnabledComponent(ComponentTransform);
         
         for(let id of this.stackListId) {
             let obj = getObjectFromId(id);
-            if(obj.getComponent(ComponentCursorCollider) !== undefined) {
-                obj.getComponent(ComponentCursorCollider).disableForThisFrame(timestamp);
-            }
+            obj.getComponents(ComponentCursorCollider).forEach((comp)=>{
+                comp.disableForThisFrame(timestamp);
+            });
             if(id != this.stackListId[0]) { // disable renderer of item below top stack
                 obj.getComponents(ComponentRenderer).forEach((renderer)=>{
                     renderer.disableForThisFrame(timestamp);
@@ -112,8 +113,6 @@ class ComponentObjectStack extends Component {
     
     addToStack(obj) {
         // put object on top of stack
-        console.log("Add to stack "+obj.id);
-        obj.getComponent
         this.stackListId.splice(0,0,obj.id);
     }
     
@@ -127,18 +126,18 @@ class ComponentObjectStack extends Component {
     }
     
     onObjectDrop(objectList) {
-        console.log("Object drop on stack");
         for(let obj of objectList) {
             this.addToStack(obj);
+            selectingObject.delete(obj);
         }
     }
     
     RPC_draw(params) {
         if(this.stackListId.length == 0) return;
         let obj = getObjectFromId(this.stackListId[0]);
-        let transform = this.gameObject.getComponent(ComponentTransform);
-        if(obj.getComponent(ComponentTransform)) {
-            obj.getComponent(ComponentTransform).pos = {
+        let transform = this.gameObject.getEnabledComponent(ComponentTransform);
+        if(obj.getEnabledComponent(ComponentTransform)) {
+            obj.getEnabledComponent(ComponentTransform).pos = {
                 x : transform.pos.x+transform.size.width+10,
                 y : transform.pos.y,
                 z : transform.pos.z+1

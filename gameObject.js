@@ -47,7 +47,6 @@ class EmptyPrefab extends Base {
                 }
             }
             if(!updated) {
-                console.log("Created new component : ",comp.className);
                 // create new component
                 var newComp = new (classList[comp.className])();
                 newComp.fromJSON(comp);
@@ -66,14 +65,15 @@ class EmptyPrefab extends Base {
         for(var comp of this.components) {
             if(comp instanceof clazz) return comp;
         }
-        return undefined;
+        return null;
     }
     getEnabledComponent(clazz) {
         for(var comp of this.components) {
             if(comp instanceof clazz && comp.isEnabled()) return comp;
         }
-        return undefined;
+        return null;
     }
+    
     getComponents(clazz) {
         var toRet = [];
         for(var comp of this.components) {
@@ -81,8 +81,16 @@ class EmptyPrefab extends Base {
         }
         return toRet;
     }
+    getEnabledComponents(clazz) {
+        var toRet = [];
+        for(var comp of this.components) {
+            if(comp instanceof clazz && comp.isEnabled()) toRet.push(comp);
+        }
+        return toRet;
+    }
+    
     addComponent(comp) {
-        if(!comp.id || comp.id == null) comp.id = generateNewId();
+        if(comp.id == null) comp.id = generateNewId();
         this.components.push(comp);
     }
     deleteComponent(comp) {
@@ -143,11 +151,6 @@ class GameObject extends EmptyPrefab {
     onKeyPress(keycode) {
         for(var comp of this.components) {
             if(comp.onKeyPress) comp.onKeyPress(keycode);
-        }
-        
-        if(keycode == 'c'.charCodeAt(0)) {
-            // copy
-            socket.emit('createObject',this.toJSON());
         }
     }
     

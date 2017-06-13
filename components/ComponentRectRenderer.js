@@ -14,11 +14,10 @@ class ComponentRectRenderer extends ComponentRenderer { // Render rectangle
     }
     
     render() {
-        if(!this.gameObject.getComponent(ComponentTransform)) {
-            console.log("[RectRenderer] can't find transform");
+        if(!this.gameObject.getEnabledComponent(ComponentTransform)) {
             return;
         }
-        var transform = this.gameObject.getComponent(ComponentTransform);
+        var transform = this.gameObject.getEnabledComponent(ComponentTransform);
         
         ctx.save();
         transform.setupCanvas();

@@ -66,7 +66,7 @@ class ComponentTransform extends Component {
     }
     
     setupCanvas() { // set canvas to match this (position , rotation)
-        if(this.parent != null) this.parent.getComponent(ComponentTransform).setupCanvas(); // setup from parent first
+        if(this.parent != null) this.parent.getEnabledComponent(ComponentTransform).setupCanvas(); // setup from parent first
         ctx.translate(this.pos.x + this.size.width/2,this.pos.y + this.size.height/2);
         ctx.rotate(this.rotation*Math.PI/180);
         ctx.translate(-this.size.width/2,-this.size.height/2);

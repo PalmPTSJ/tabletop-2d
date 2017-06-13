@@ -55,7 +55,6 @@ class Component extends Base {
     callRPC(func,params) {
         // issue func call on server with params
         if(isServer) {
-            console.log("RPC TARG : ",this.componentName,this);
             this[func](params);
         }
         else {

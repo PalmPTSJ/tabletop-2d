@@ -17,11 +17,11 @@ class ComponentTextRenderer extends ComponentRenderer {
     }
 
     render() {
-        if(!this.gameObject.getComponent(ComponentTransform)) {
+        if(!this.gameObject.getEnabledComponent(ComponentTransform)) {
             console.log("[TextRenderer] can't find transform");
             return;
         }
-        var transform = this.gameObject.getComponent(ComponentTransform);
+        var transform = this.gameObject.getEnabledComponent(ComponentTransform);
         ctx.save();
         transform.setupCanvas();
         ctx.font = this.font;

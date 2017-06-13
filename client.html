@@ -96,7 +96,6 @@
             fpsCount = 0;
         },1000);
         
-        var flip = false;
         var globalRotation = 0;
         function setGlobalRotation(angle) {
             globalRotation = angle;
@@ -116,12 +115,12 @@
             for(var obj of objectList) {
                 if(obj.id == id) return obj;
             }
-            return undefined;
+            return null;
         }
         function sortObjectList() { // Low Z -> High Z
             objectList.sort((a,b)=>{
-                var ta = a.getComponent(ComponentTransform);
-                var tb = b.getComponent(ComponentTransform);
+                var ta = a.getEnabledComponent(ComponentTransform);
+                var tb = b.getEnabledComponent(ComponentTransform);
                 if(ta.pos.z < tb.pos.z) return -1;
                 else if(ta.pos.z == tb.pos.z) return 0;
                 return 1;
@@ -129,9 +128,9 @@
         }
         var idGenerator = 0;
         function generateNewId() {
-            // generate new id in form [Player id]_[Int]
-            if(playerInfo.id === undefined) {
-                console.log("Id generation request when playerInfo is not ready");
+            // generate new id in form [Player id]_[Integer]
+            if(playerInfo.id == null) {
+                log("ID generation request when playerInfo is not ready");
                 return "GG";
             }
             return ""+playerInfo.id+"_"+(idGenerator++);
@@ -142,7 +141,6 @@
 		var socket = io("ws://"+ip);
 
 		socket.on('log',function (data) {
-			console.log("Server log : ",data);
             log(data);
 		});
         
@@ -172,8 +170,7 @@
         
         socket.on('updateObject',function(data) {
             // update object of that id
-            getObjectFromId(data.id).getComponent(ComponentNetwork).onNetworkUpdate(data);
-            //sortObjectList();
+            getObjectFromId(data.id).getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
         });
         
         socket.on('deleteObject',function(id) {
@@ -184,13 +181,14 @@
         });
         
         socket.on('playerInfo',function(data) {
+            log("My player ID : "+data.id);
             playerInfo = data;
         });
 		
         function createObjectFromPrefab(prefab) {
             var obj = prefab.instantiate();
-            obj.getComponent(ComponentTransform).pos.x = canvasX + canvas.width/2;
-            obj.getComponent(ComponentTransform).pos.y = canvasY + canvas.height/2;
+            obj.getEnabledComponent(ComponentTransform).pos.x = canvasX + canvas.width/2;
+            obj.getEnabledComponent(ComponentTransform).pos.y = canvasY + canvas.height/2;
             return obj;
         }
         
@@ -198,11 +196,13 @@
             // setup canvas
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
+            // set width and height
             canvas.width = $(canvas.parentNode).innerWidth();
             canvas.height = canvas.width / (4/3);
             $(canvas).css("width",canvas.width);
             $(canvas).css("height",canvas.height);
-        
+            
+            // setup global position
             ctx.save();
             ctx.translate(  -((canvasX+canvas.width/2)*canvasScale - canvas.width/2),
                             -((canvasY+canvas.height/2)*canvasScale - canvas.height/2));
@@ -228,7 +228,6 @@
         
         canvas.width = $(canvas.parentNode).innerWidth();
         canvas.height = canvas.width / (4/3);
-        
         $(canvas).css("width",canvas.width);
         $(canvas).css("height",canvas.height);
         
@@ -273,8 +272,8 @@
             // rotate offX , offY with globalRotation
             if(mouseLastPos.isMovingObject) {
                 for(var obj of selectingObject) {
-                    obj.getComponent(ComponentTransform).pos.x += (Math.cos(globalRotation * Math.PI / 180)*offX + Math.sin(globalRotation * Math.PI / 180)*offY) / canvasScale;
-                    obj.getComponent(ComponentTransform).pos.y += (- Math.sin(globalRotation * Math.PI / 180)*offX + Math.cos(globalRotation * Math.PI / 180)*offY) / canvasScale;
+                    obj.getEnabledComponent(ComponentTransform).pos.x += (Math.cos(globalRotation * Math.PI / 180)*offX + Math.sin(globalRotation * Math.PI / 180)*offY) / canvasScale;
+                    obj.getEnabledComponent(ComponentTransform).pos.y += (- Math.sin(globalRotation * Math.PI / 180)*offX + Math.cos(globalRotation * Math.PI / 180)*offY) / canvasScale;
                 }
             }
             else {
@@ -317,7 +316,8 @@
                 }
             }
         });
-
+        
+        // console
         $(document).ready(function(){
             $('#consoleInput').keypress(function(e){
                 if(e.keyCode==13) {
