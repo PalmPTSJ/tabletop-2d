@@ -29,6 +29,10 @@ class ComponentImageRendererMulti extends ComponentImageRenderer {
                 this.applyFace((this.currentFaceIndex+1) % this.faces.length);
             }
         }
+        if(key == 'r'.charCodeAt(0)) {
+            // random
+            this.applyFace(Math.floor(Math.random()*this.faces.length));
+        }
     }
     
     applyFace(i) {

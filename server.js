@@ -95,8 +95,10 @@ io.on('connection',function (socket) {
 	});
     
     socket.on('updateObject',function (data) {
-        objectList[data.id].getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
-        socket.broadcast.emit('updateObject',data); // broadcast to everyone except sender
+        if(objectList[data.id] != undefined) {
+            objectList[data.id].getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
+            socket.broadcast.emit('updateObject',data); // broadcast to everyone except sender
+        }
     });
     
     socket.on('callRPC',function(data) {
