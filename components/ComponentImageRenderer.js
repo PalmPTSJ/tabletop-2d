@@ -35,6 +35,11 @@ class ComponentImageRenderer extends ComponentRenderer { // This component rende
         if(this.url) this.img.src = this.url;
         
     }
+    
+    buildInspector(builder) {
+        super.buildInspector(builder);
+        builder.addTextField("URL",builder.autoEvent({ get:()=>{return this.url}, set:(val)=>{this.url = val} }));
+    }
 }
 
 classList["ComponentImageRenderer"] = ComponentImageRenderer;

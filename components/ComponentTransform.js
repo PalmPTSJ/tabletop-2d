@@ -71,6 +71,22 @@ class ComponentTransform extends Component {
         ctx.rotate(this.rotation*Math.PI/180);
         ctx.translate(-this.size.width/2,-this.size.height/2);
     }
+    
+    buildInspector(builder) {
+        super.buildInspector(builder);
+        
+        // Pos
+        builder.addTextField("X",builder.autoEvent({ get:()=>{return this.pos.x}, set:(val)=>{this.pos.x = parseFloat(val)} }));
+        builder.addTextField("Y",builder.autoEvent({ get:()=>{return this.pos.y}, set:(val)=>{this.pos.y = parseFloat(val)} }));
+        builder.addTextField("Z",builder.autoEvent({ get:()=>{return this.pos.z}, set:(val)=>{this.pos.z = parseFloat(val)} }));
+        
+        // Size
+        builder.addTextField("Width",builder.autoEvent({ get:()=>{return this.size.width}, set:(val)=>{this.size.width = parseFloat(val)} }));
+        builder.addTextField("Height",builder.autoEvent({ get:()=>{return this.size.height}, set:(val)=>{this.size.height = parseFloat(val)} }));
+        
+        // Rotation
+        builder.addTextField("Rotation",builder.autoEvent({ get:()=>{return this.rotation}, set:(val)=>{this.rotation = parseFloat(val)} }));
+    }   
 }
 
 classList["ComponentTransform"] = ComponentTransform;

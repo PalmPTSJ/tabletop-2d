@@ -58,6 +58,12 @@ class ComponentObjectInHand extends Component {
         
         return true;
     }
+    
+    buildInspector(builder) {
+        super.buildInspector(builder);
+        builder.addTextField("Owner",builder.autoEvent({ get:()=>{return this.player}, set:(val)=>{this.player = val} }));
+        
+    }
 
 }
 

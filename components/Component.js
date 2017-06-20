@@ -1,7 +1,7 @@
 class Component extends Base {
     constructor(name) {
         super();
-        this.componentName = name;
+        this.name = name;
         this.enabled = true;
         this.enabledThisFrame = true;
         this.disabledForAFrame = false;
@@ -76,6 +76,10 @@ class Component extends Base {
     
     isEnabled() {
         return this.enabledThisFrame;
+    }
+    
+    buildInspector(builder) {
+        
     }
 }
 classList["Component"] = Component;

@@ -10,9 +10,16 @@
         
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
         
-        <link rel="stylesheet" href="lib/materialize.min.css">
-        <script src="lib/materialize.min.js"></script>
+        <!--<link rel="stylesheet" href="lib/materialize.min.css">
+        <script src="lib/materialize.min.js"></script>-->
+        
+        <!-- Bootstrap 4 -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
+        
 		<script src="gameObject.js"></script>
         <script src="components.js"></script>
         
@@ -20,45 +27,71 @@
             #prefabList > * {
                 cursor:pointer;
             }
+            #rightTab_nav_prefab {
+                cursor:pointer;
+            }
+            #rightTab_nav_console {
+                cursor:pointer;
+            }
+            #rightTab_nav_objectInspector {
+                cursor:pointer;
+            }
         </style>
         
 	</head>
-	<body style="padding:0px 50px;">
-    
+	<body style="padding:15px;">
         <div class="row">
-            <div class="col m12 l8" style="">
+            <div class="col-md-12 col-lg-8" style="">
 				<div style="width:100%">
-					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1">
+					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1" class="success">
 				
 					</canvas>
 				</div>
             </div>
-            <div class="col m12 l4">
-                <div id="">
-                    <h4>Console & Debug</h4>
-                    <p id="debugCanvasPos"></p>
-                    <p id="debugFPS"></p>
-                    <div class="input-field">
-                        <textarea id="debugConsole" style="height:150px" readonly></textarea>
+            <div class="col-md-12 col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a id="rightTab_nav_prefab" class="nav-link active" onclick="changeRightTab('prefab')">Prefab</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="rightTab_nav_console" class="nav-link" onclick="changeRightTab('console')">Console</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="rightTab_nav_objectInspector" class="nav-link" onclick="changeRightTab('objectInspector')">Object Inspector</a>
+                        </li>
+                    </ul>
                     </div>
-                    <div class="input-field">
-                        <input type="text" id="consoleInput"></input>
-                        <label class="active" for="consoleInput">Console Input</label>
+                    <div class="card-block">
+                        <div id="prefabListDiv">
+                            <ul id="prefabList" class="list-group">
+                                
+                            </ul>
+                        </div>
+                        <div id="consoleDiv">
+
+                            <div class="row">
+                                <span id="debugCanvasPos" class="col-sm-8"></span>
+                                <span id="debugFPS" class="col-sm-4 text-right"></span>
+                            </div>
+                            <textarea class="form-control" id="debugConsole" style="height:150px" readonly></textarea>
+                            <div class="form-group">
+                                <label class="active" for="consoleInput">Console Input</label>
+                                <input class="form-control" type="text" id="consoleInput"></input>
+                            </div>
+                        </div>
+                        <div id="objectInspectorDiv">
+
+                            <p>Selecting object : <span id="objectInspector_selectingObject">NONE</span></p>
+                            <div class="row">
+                                <div class="col s12" id="objectInspector">
+                                    
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
                 </div>
-				<div id="prefabListDiv">
-					<h4>Prefab</h4>
-                    <ul id="prefabList" class="collection">
-                        
-                    </ul>
-				</div>
-                <div id="objectListDiv">
-					<h4>Object list</h4>
-                    <ul id="objectList" class="collection">
-                        
-                    </ul>
-				</div>
             </div>
         </div>
 	</body>
@@ -80,15 +113,38 @@
     <script src="components/ComponentRectRenderer.js"></script>
     <script src="components/ComponentTextRenderer.js"></script>
     <script src="components/ComponentImageRendererMulti.js"></script>
-    <!-- End include components -->
     
+    <script src="objectInspector.js"></script>
+    <!-- End include components -->
+    <script> // HTML Related
+        function changeRightTab(tab) {
+            $("#prefabListDiv").hide();         $("#rightTab_nav_prefab").removeClass("active");
+            $("#consoleDiv").hide();            $("#rightTab_nav_console").removeClass("active");
+            $("#objectInspectorDiv").hide();    $("#rightTab_nav_objectInspector").removeClass("active");
+            if(tab == 'prefab') { $("#prefabListDiv").show(); $("#rightTab_nav_prefab").addClass("active"); }
+            else if(tab == 'console') { $("#consoleDiv").show(); $("#rightTab_nav_console").addClass("active"); }
+            else if(tab == 'objectInspector') { $("#objectInspectorDiv").show(); $("#rightTab_nav_objectInspector").addClass("active"); }
+        }
+        $(document).ready(function(){
+            $('#consoleInput').keypress(function(e){
+                if(e.keyCode==13) {
+                    var cmd = $("#consoleInput").val();
+                    $("#consoleInput").val("");
+                    eval(cmd);
+                }
+                $('#linkadd').click();
+            });
+            
+            changeRightTab('objectInspector');
+        });
+    </script>
 	<script>
         var isServer = false;
         /// Debug function / Temp function
         var fpsCount = 0;
         function log(data) { // log to console
             var now = new Date();
-            data = ("[" + now.getHours() + ':' + now.getMinutes() + ":" + now.getSeconds() + "] ") + data;
+            data = ("[" + ("0"+now.getHours()).substr(-2) + ':' + ("0"+now.getMinutes()).substr(-2) + ":" + ("0"+now.getSeconds()).substr(-2) + "] ") + data;
             $("#debugConsole").html(($("#debugConsole").html()+data+"\n").substr(-1000)); // last 1000 chars
         }
         window.setInterval(()=>{
@@ -137,9 +193,17 @@
         }
 
         /// Socket events
-        var ip = prompt("Please enter ip address","127.0.0.1:8080");
-		var socket = io("ws://"+ip);
+		var socket = io();
 
+        socket.on('connect',function() { // Reset everything
+            log("Connected");
+            objectList = [];
+            prefabList = {}; $("#prefabList").html("");
+            playerInfo = {};
+            selectingObject = new Set();
+            objectInspector = new ObjectInspector(CardBuilder);
+        });
+        
 		socket.on('log',function (data) {
             log(data);
 		});
@@ -151,7 +215,7 @@
             
             // create new collection button
             var prefabCollection = document.createElement("li");
-            prefabCollection.className = "collection-item";
+            prefabCollection.className = "list-group-item";
             prefabCollection.innerHTML = prefab.name;
             prefabCollection.onclick = function() {
                 // emit object create event
@@ -192,6 +256,8 @@
             return obj;
         }
         
+        var objectInspector = new ObjectInspector(CardBuilder);
+        
 		function update(timestamp) {
             // setup canvas
             ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -213,6 +279,30 @@
 			for(var obj of objectList) obj.update(timestamp);
 			
             ctx.restore();
+            
+            // Object inspector
+            if(selectingObject.size == 0) {
+                $("#objectInspector").html("");
+                $("#objectInspector_selectingObject").html("NONE");
+                objectInspector.inspect(null);
+            }
+            else if(selectingObject.size > 1) {
+                $("#objectInspector").html("");
+                $("#objectInspector_selectingObject").html("MULTIPLE");
+                objectInspector.inspect(null);
+            }
+            else {
+                var obj = selectingObject.values().next().value;
+                $("#objectInspector_selectingObject").html(obj.id);
+                if(objectInspector.inspectingObject == null || objectInspector.inspectingObject.id != obj.id) {
+                    log("Inspecting : "+obj.id);
+                    objectInspector.inspect(obj);
+                    $("#objectInspector").html("");
+                    objectInspector.applyHTML($("#objectInspector")[0]);
+                }
+                
+                objectInspector.update();
+            }
             
             fpsCount++;
             
@@ -317,18 +407,6 @@
                     }
                 }
             }
-        });
-        
-        // console
-        $(document).ready(function(){
-            $('#consoleInput').keypress(function(e){
-                if(e.keyCode==13) {
-                    var cmd = $("#consoleInput").val();
-                    $("#consoleInput").val("");
-                    eval(cmd);
-                }
-                $('#linkadd').click();
-            });
         });
         
         var isKeyDown = {};

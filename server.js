@@ -113,9 +113,11 @@ io.on('connection',function (socket) {
     });
     
     socket.on('deleteObject',function (id) {
-        objectList[id].destroy();
-        delete objectList[id];
-        io.emit('deleteObject',id);
+        if(objectList[id] != undefined) {
+            objectList[id].destroy();
+            delete objectList[id];
+            io.emit('deleteObject',id);
+        }
     });
 });
 
