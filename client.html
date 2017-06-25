@@ -135,7 +135,7 @@
                 $('#linkadd').click();
             });
             
-            changeRightTab('objectInspector');
+            changeRightTab('console');
         });
     </script>
 	<script>
@@ -337,7 +337,8 @@
         
         var mouseLastPos = {x:0,y:0,down:false};
         var selectingObject = new Set();
-        canvas.addEventListener("mousedown",function (e) {
+        
+        function onMouseDown(e) {
             e.preventDefault();
             canvas.focus();
             mouseLastPos = {
@@ -355,9 +356,10 @@
             for(var obj of selectingObject)
                 if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos))
                     mouseLastPos.isMovingObject = true;
-        });
+        }
+        canvas.addEventListener("mousedown",onMouseDown);
         
-        canvas.addEventListener("mousemove",function (e) {
+        function onMouseMove(e) {
             if(!mouseLastPos.down) return;
             var offX = e.pageX - $(canvas).offset().left - mouseLastPos.x;
             var offY = e.pageY - $(canvas).offset().top - mouseLastPos.y;
@@ -376,9 +378,10 @@
             mouseLastPos.y = e.pageY - $(canvas).offset().top;
             mouseLastPos.move = true;
             mouseLastPos.moveLength += Math.abs(offX+offY) + mouseLastPos.moveLength;
-        });
+        }
+        canvas.addEventListener("mousemove",onMouseMove);
         
-        canvas.addEventListener("mouseup",function (e) {
+        function onMouseUp(e) {
             mouseLastPos.down = false;
             var clickPos = {
                 x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
@@ -407,7 +410,8 @@
                     }
                 }
             }
-        });
+        }
+        canvas.addEventListener("mouseup",onMouseUp);
         
         var isKeyDown = {};
         canvas.addEventListener("keydown",function (e) {

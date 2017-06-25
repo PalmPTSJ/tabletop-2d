@@ -3,6 +3,7 @@ class ComponentTextRenderer extends ComponentRenderer {
         super("textRenderer");
         this.text = "";
         this.font = "30px Arial";
+        
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
@@ -24,10 +25,18 @@ class ComponentTextRenderer extends ComponentRenderer {
         var transform = this.gameObject.getEnabledComponent(ComponentTransform);
         ctx.save();
         transform.setupCanvas();
+        ctx.textBaseline="top"; 
         ctx.font = this.font;
         ctx.fillText(this.text,0,0);
         ctx.restore();
     }
+    
+    buildInspector(builder) {
+        super.buildInspector(builder);
+        // Text
+        builder.addTextField("Text",builder.autoEvent({ get:()=>{return this.text}, set:(val)=>{this.text = val} }));
+        builder.addTextField("Font",builder.autoEvent({ get:()=>{return this.font}, set:(val)=>{this.font = val} }));
+    }   
 }
 
 classList["ComponentTextRenderer"] = ComponentTextRenderer;
