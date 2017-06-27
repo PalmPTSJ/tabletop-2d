@@ -1,6 +1,6 @@
 class ComponentObjectInHand extends Component {
     constructor(name) {
-        super("objectInHand");
+        super(name);
         this.player = 0;
         this.handImg = new Image;
         this.handImg.src = "http://icons.iconarchive.com/icons/icons8/ios7/128/Hands-Hand-icon.png";

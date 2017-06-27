@@ -1,6 +1,6 @@
 class ComponentTextRenderer extends ComponentRenderer {
-    constructor() {
-        super("textRenderer");
+    constructor(name) {
+        super(name);
         this.text = "";
         this.font = "30px Arial";
         

@@ -1,7 +1,10 @@
 class Component extends Base {
     constructor(name) {
         super();
+        
+        if(name == undefined) name = this.constructor.name;
         this.name = name;
+        
         this.enabled = true;
         this.enabledThisFrame = true;
         this.disabledForAFrame = false;
@@ -10,13 +13,15 @@ class Component extends Base {
     toJSON() {
         return Object.assign(super.toJSON(),{
             id : this.id,
-            enabled : this.enabled
+            enabled : this.enabled,
+            name : this.name
         });
     }
     fromJSON(data) {
         super.fromJSON(data);
         if(data.id) this.id = data.id;
         if(data.enabled) this.enabled = data.enabled;
+        if(data.name) this.name = data.name;
         return this;
     }
     onStart() {

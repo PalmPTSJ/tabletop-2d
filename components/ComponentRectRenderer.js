@@ -1,6 +1,6 @@
 class ComponentRectRenderer extends ComponentRenderer { // Render rectangle
-    constructor() {
-        super("rectRenderer");
+    constructor(name) {
+        super(name);
     }
     toJSON() {
         return Object.assign(super.toJSON(),{

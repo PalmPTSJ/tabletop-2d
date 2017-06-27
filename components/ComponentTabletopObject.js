@@ -1,6 +1,6 @@
 class ComponentTabletopObject extends Component {
     constructor(name) {
-        super("tabletopObject");
+        super(name);
     }
     onKeyPress(key) {
         super.onKeyPress(key);

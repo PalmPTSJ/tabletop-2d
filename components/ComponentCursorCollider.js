@@ -1,6 +1,6 @@
 class ComponentCursorCollider extends Component { // This component allow cursor to click this object
-    constructor() {
-        super("cursorCollider");
+    constructor(name) {
+        super(name);
     }
     isOver(cursorPos) {
         // check hit with point

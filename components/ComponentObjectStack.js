@@ -1,6 +1,6 @@
 class ComponentObjectStack extends Component {
     constructor(name) {
-        super("objectStack");
+        super(name);
         this.stackListId = []; // stack object id (0 = top)
     }
     

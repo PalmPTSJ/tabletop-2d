@@ -1,6 +1,6 @@
 class ComponentImageRendererMulti extends ComponentImageRenderer {
     constructor(name) {
-        super("imageSwapper");
+        super(name);
         this.faces = [];
         this.currentFaceIndex = 0;
     }
@@ -38,6 +38,11 @@ class ComponentImageRendererMulti extends ComponentImageRenderer {
     applyFace(i) {
         this.currentFaceIndex = i;
         this.applyImage(this.faces[this.currentFaceIndex]);
+    }
+    
+    buildInspector(builder) {
+        super.buildInspector(builder);
+        builder.addArrayField("Image Data Array",builder.autoEvent({ get:()=>{return this.faces}, set:(val)=>{this.faces = val} }));
     }
 }
 

@@ -1,6 +1,6 @@
 class ComponentImageRenderer extends ComponentRenderer { // This component render object's image
-    constructor() {
-        super("imageRenderer");
+    constructor(name) {
+        super(name);
     }
     toJSON() {
         return Object.assign(super.toJSON(),{

@@ -1,6 +1,6 @@
 class ComponentNetwork extends Component {
-    constructor() {
-        super("network");
+    constructor(name) {
+        super(name);
         this.lastJSON = "";
         this.lastTimestamp = null;
     }

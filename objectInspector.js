@@ -36,8 +36,8 @@ class CardBuilder {
     }
     
     /*
-    onUpdate(targetInputField)
-    onInput(newInput)
+    onEvent.onUpdate(targetInputField)
+    onEvent.onInput(newInput)
     */
     
     addTextField(descText,onEvent) { // [descText] [______________]
@@ -63,8 +63,11 @@ class CardBuilder {
         var inputData = {
             rootNode : div,
             inputNode : textField,
-            onUpdate : onEvent.onUpdate,
-            onInput : onEvent.onInput,
+
+            onUpdate : ()=>{
+                if(inputData.inputNode === document.activeElement) return;
+                onEvent.onUpdate.call(this.targetComponent,inputData);
+            },
             
             get : ()=>{ return textField.value},
             set : (val)=>{ textField.value = val}
@@ -72,18 +75,120 @@ class CardBuilder {
         
         $(textField).keypress(function(e){
             if(e.keyCode==13) {
-                inputData.onInput.call(this.targetComponent,inputData);
+                onEvent.onInput.call(this.targetComponent,inputData);
             }
         });
         
         this.inputList.push(inputData);
     }
     
+    addArrayField(descText,onEvent) {
+        var div = document.createElement("div");
+        div.className = "card";
+        
+        var divInside = document.createElement("div");
+        divInside.className = "card-block";
+        divInside.innerHTML = "<h5 class=\"card-title\">"+descText+"</h5>";
+        
+        var div2 = document.createElement("label");
+        div2.className = "col-4 col-form-label";
+        div2.innerHTML = descText;
+        
+        var divText = document.createElement("div");
+        divText.className = "col-8";
+        
+        var textField = document.createElement("input");
+        textField.setAttribute("type","text");
+        textField.className = "form-control";
+        
+       /* divText.appendChild(textField);
+        div.appendChild(div2);
+        div.appendChild(divText);*/
+        div.appendChild(divInside);
+        this.cardContent.appendChild(div);
+        
+        
+        var inputData = {
+            rootNode : divInside,
+            inputNode : textField,
+            textFieldList : [],
+            
+            onUpdate : (inputData)=>{
+                for(var textField of inputData.textFieldList) {
+                    if(textField === document.activeElement) return;
+                }
+                if(inputData.inputNode === document.activeElement) return;
+                
+                onEvent.onUpdate.call(this.targetComponent,inputData);
+            },
+            
+            get : ()=>{
+                var toRet = [];
+                for(var textField of inputData.textFieldList) {
+                    toRet.push(textField.value);
+                }
+                return toRet;
+            },
+            set : (val)=>{ 
+                // update length
+                if(inputData.textFieldList.length != val.length) {
+                    while(inputData.textFieldList.length < val.length) {
+                        // create new text field
+                        var div = document.createElement("div");
+                        div.className = "form-group row";
+                        
+                        var divL = document.createElement("label");
+                        divL.className = "col-1 col-form-label";
+                        divL.innerHTML = ""+inputData.textFieldList.length;
+                        
+                        var divText = document.createElement("div");
+                        divText.className = "col-8";
+                        
+                        var divButton = document.createElement("div");
+                        divButton.className = "col-3";
+                        
+                        var delButton = document.createElement("button");
+                        delButton.setAttribute("type","button");
+                        delButton.className = "btn btn-danger btn-block";
+                        delButton.innerHTML = "X";
+                        
+                        var textField = document.createElement("input");
+                        textField.setAttribute("type","text");
+                        textField.className = "form-control";
+                        
+                        divText.appendChild(textField);
+                        divButton.appendChild(delButton);
+                        div.appendChild(divL);
+                        div.appendChild(divText);
+                        div.appendChild(divButton);
+                        
+                        inputData.rootNode.appendChild(div);
+                        inputData.textFieldList.push(textField);
+                        
+                        $(textField).keypress(function(e){
+                            if(e.keyCode==13) {
+                                onEvent.onInput.call(this.targetComponent,inputData);
+                            }
+                        });
+                    }
+                    while(inputData.textFieldList.length > val.length) {
+                        var rootDiv = inputData.textFieldList.pop().parentElement.parentElement;
+                        rootDiv.parentElement.removeChild(rootDiv);
+                    }
+                }
+                // fill data
+                for(var i = 0;i < val.length;i++) {
+                    inputData.textFieldList[i].value = val[i];
+                }
+            }
+        };
+        
+        this.inputList.push(inputData);
+    }
+    
     onUpdate() {
         for(var input of this.inputList) {
-            if(input.inputNode === document.activeElement) continue;
-            
-            input.onUpdate.call(this.targetComponent,input);
+            input.onUpdate(input);
         }
     }
     

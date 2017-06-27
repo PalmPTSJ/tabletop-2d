@@ -1,8 +1,8 @@
 // Base class for any renderer class
 
 class ComponentRenderer extends Component {
-    constructor() {
-        super("renderer");
+    constructor(name) {
+        super(name);
         this.enabled = true;
         this.enabledThisFrame = true;
     }

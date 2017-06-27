@@ -1,6 +1,6 @@
 class ComponentTransform extends Component {
-    constructor() {
-        super("transform");
+    constructor(name) {
+        super(name);
         this.parent = null;
         this.pos = {x:0,y:0,z:0};
         this.lastPos = {x:0,y:0,z:0};
