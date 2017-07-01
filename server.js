@@ -35,6 +35,7 @@ var playerIdGenerator = 0;
 var idGenerator = 0;
 
 /// Copy client's requirement
+global.objectList = objectList;
 global.isServer = true;
 global.generateNewId = function() {
     return "SERV_"+(idGenerator++);

@@ -26,6 +26,7 @@ class ComponentTransform extends Component {
     }
     
     setPos(newPos) {
+        console.log("Set Pos to ",newPos);
         if(newPos.x != undefined) this.pos.x = newPos.x;
         if(newPos.y != undefined) this.pos.y = newPos.y;
         if(newPos.z != undefined) this.pos.z = newPos.z;

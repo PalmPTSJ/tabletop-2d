@@ -79,13 +79,18 @@ class RPG_ComponentHero extends Component {
         });
         obj.getEnabledComponent(ComponentTransformTween).setTargetPos({
             x : myPos.x,
-            y : myPos.y-200
+            y : myPos.y-400
         });
+        
+        console.log("Create new damage text");
+        for(var id in objectList) {
+            console.log(id,objectList[id].getEnabledComponent(ComponentTransform).pos);
+        }
         
         obj.getEnabledComponent(ComponentTextRenderer).text = ""+dmg;
         
         obj.addComponent(new ComponentAutoDestroy());
-        obj.getEnabledComponent(ComponentAutoDestroy).countdown = 100;
+        obj.getEnabledComponent(ComponentAutoDestroy).countdown = 60;
         
         server_createObject(obj.toJSON());
         
