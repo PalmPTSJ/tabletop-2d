@@ -17,12 +17,18 @@ class ComponentTransform extends Component {
     }
     fromJSON(data) {
         super.fromJSON(data);
-        
+        //if(this.gameObject != null) console.log(this.gameObject.id,data.pos);
         if(data.pos !== undefined) this.pos = data.pos;
         if(data.size !== undefined) this.size = data.size;
         this.parent = data.parentId==null?null:objectList[data.parentId];
         if(data.rotation !== undefined) this.rotation = data.rotation;
         return this;
+    }
+    
+    setPos(newPos) {
+        if(newPos.x != undefined) this.pos.x = newPos.x;
+        if(newPos.y != undefined) this.pos.y = newPos.y;
+        if(newPos.z != undefined) this.pos.z = newPos.z;
     }
     
     onUpdate(timestamp) {

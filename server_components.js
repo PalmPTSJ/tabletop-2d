@@ -15,6 +15,7 @@ module.exports = function(context) {
 
     importFile("components/Component.js");
     importFile("components/ComponentTransform.js");
+    importFile("components/ComponentTransformTween.js")
     importFile("components/ComponentNetwork.js");
 
     importFile("components/ComponentTabletopObject.js");
@@ -28,5 +29,9 @@ module.exports = function(context) {
     importFile("components/ComponentRectRenderer.js");
     importFile("components/ComponentTextRenderer.js");
     importFile("components/ComponentImageRendererMulti.js");
+    
+    importFile("components/ComponentAutoDestroy.js");
+    importFile("components/RPG_ComponentHero.js");
+    
     return context;
 }

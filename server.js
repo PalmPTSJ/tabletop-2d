@@ -32,8 +32,13 @@ var objectIdGenerator = 0;
 var prefabIdGenerator = 0;
 var playerIdGenerator = 0;
 
+var idGenerator = 0;
+
 /// Copy client's requirement
 global.isServer = true;
+global.generateNewId = function() {
+    return "SERV_"+(idGenerator++);
+}
 var components = require('./server_components.js')(global);
 for(var comp in global.classList) {
     global[comp] = global.classList[comp];
@@ -47,6 +52,29 @@ global.Image = class {
 global.socket = io;
 
 console.log("Server ready !");
+
+global.server_createObject = function(data) {
+    //console.log("S_CREATE",data);
+    if(data.id == null) {
+        let id = "SO_"+(objectIdGenerator++);
+        data.id = id;
+    }
+    console.log("New object "+data.id+" created");
+    let obj = new GameObject();
+    obj.fromJSON(data);
+    objectList[data.id] = obj;
+    
+    io.emit('newObject',data);
+}
+
+global.server_deleteObject = function(id) {
+    if(objectList[id] != undefined) {
+        objectList[id].destroy();
+        delete objectList[id];
+        io.emit('deleteObject',id);
+    }
+}
+
 io.on('connection',function (socket) {
 	log("New connection from "+socket.request.connection.remoteAddress);
     
@@ -72,24 +100,26 @@ io.on('connection',function (socket) {
 	
 	socket.on('createPrefab',function (prefab) {
         if(prefab.id == null) {
-            var id = "SP_"+(prefabIdGenerator++);
+            let id = "SP_"+(prefabIdGenerator++);
             prefab.id = id;
         }
         console.log("New prefab "+prefab.id+" created");
-        prefabList[id] = prefab;
+        prefabList[prefab.id] = prefab;
         
 		io.emit('newPrefab',prefab);
 	});
 	
 	socket.on('createObject',function (data) {
+        //console.log("C_CREATE",data);
+        
         if(data.id == null) {
-            var id = "SO_"+(objectIdGenerator++);
+            let id = "SO_"+(objectIdGenerator++);
             data.id = id;
         }
-        console.log("New object "+id+" created");
+        console.log("New object "+data.id+" created");
         var obj = new GameObject();
         obj.fromJSON(data);
-		objectList[id] = obj;
+		objectList[data.id] = obj;
         
 		io.emit('newObject',data);
 	});

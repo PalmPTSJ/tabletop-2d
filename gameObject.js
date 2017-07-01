@@ -106,6 +106,7 @@ class EmptyPrefab extends Base {
             var comp = this.components[name];
             // clone component
             var newComp = new (comp.constructor)();
+            //newComp.id = generateNewId();
             newComp.fromJSON(comp);
             object.addComponent(newComp);
         }
@@ -144,6 +145,7 @@ class GameObject extends EmptyPrefab {
     }
     
     addComponent(comp) {
+        //if(comp.id == null) comp.id = generateNewId();
         super.addComponent(comp);
         comp.gameObject = this;
     }

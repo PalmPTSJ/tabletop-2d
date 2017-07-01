@@ -43,7 +43,7 @@
         <div class="row">
             <div class="col-md-12 col-lg-8" style="">
 				<div style="width:100%">
-					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1" class="success">
+					<canvas id="gameCanvas" style="border:1px solid black;" tabindex="1" oncontextmenu="return false;">
 				
 					</canvas>
 				</div>
@@ -96,10 +96,44 @@
         </div>
 	</body>
     
+    <script> // Define variables for component initialization
+        var isServer = false;
+        
+        function log(data) { // log to console
+            var now = new Date();
+            data = ("[" + ("0"+now.getHours()).substr(-2) + ':' + ("0"+now.getMinutes()).substr(-2) + ":" + ("0"+now.getSeconds()).substr(-2) + "] ") + data;
+            $("#debugConsole").html(($("#debugConsole").html()+data+"\n").substr(-1000)); // last 1000 chars
+        }
+        
+		var canvas = document.getElementById("gameCanvas");
+		var ctx = canvas.getContext("2d");
+		
+		var objectList = [];
+        var prefabList = {};
+        var playerInfo = {};
+        
+        function getObjectFromId(id) {
+            for(var obj of objectList) {
+                if(obj.id == id) return obj;
+            }
+            return null;
+        }
+        
+        function generateNewId() {
+            // generate new id in form [Player id]_[Integer]
+            if(playerInfo.id == null) {
+                log("ID generation request when playerInfo is not ready");
+                return "GG";
+            }
+            return ""+playerInfo.id+"_"+(idGenerator++);
+        }
+    </script>
+    
     <!-- Include components -->
     <script src="components/Component.js"></script>
     
     <script src="components/ComponentTransform.js"></script>
+    <script src="components/ComponentTransformTween.js"></script>
     <script src="components/ComponentNetwork.js"></script>
     
     <script src="components/ComponentTabletopObject.js"></script>
@@ -113,6 +147,9 @@
     <script src="components/ComponentRectRenderer.js"></script>
     <script src="components/ComponentTextRenderer.js"></script>
     <script src="components/ComponentImageRendererMulti.js"></script>
+    
+    <script src="components/ComponentAutoDestroy.js"></script>
+    <script src="components/RPG_ComponentHero.js"></script>
     
     <script src="objectInspector.js"></script>
     <!-- End include components -->
@@ -139,14 +176,9 @@
         });
     </script>
 	<script>
-        var isServer = false;
+        
         /// Debug function / Temp function
         var fpsCount = 0;
-        function log(data) { // log to console
-            var now = new Date();
-            data = ("[" + ("0"+now.getHours()).substr(-2) + ':' + ("0"+now.getMinutes()).substr(-2) + ":" + ("0"+now.getSeconds()).substr(-2) + "] ") + data;
-            $("#debugConsole").html(($("#debugConsole").html()+data+"\n").substr(-1000)); // last 1000 chars
-        }
         window.setInterval(()=>{
             $("#debugFPS").html("FPS : "+fpsCount);
             fpsCount = 0;
@@ -158,21 +190,6 @@
             log("Global rotation set to : "+globalRotation);
         }
         
-        /// Object
-		var canvas = document.getElementById("gameCanvas");
-		var ctx = canvas.getContext("2d");
-		
-		var objectList = [];
-        var prefabList = {};
-        
-        var playerInfo = {};
-
-        function getObjectFromId(id) {
-            for(var obj of objectList) {
-                if(obj.id == id) return obj;
-            }
-            return null;
-        }
         function sortObjectList() { // Low Z -> High Z
             objectList.sort((a,b)=>{
                 var ta = a.getEnabledComponent(ComponentTransform);
@@ -183,14 +200,6 @@
             })
         }
         var idGenerator = 0;
-        function generateNewId() {
-            // generate new id in form [Player id]_[Integer]
-            if(playerInfo.id == null) {
-                log("ID generation request when playerInfo is not ready");
-                return "GG";
-            }
-            return ""+playerInfo.id+"_"+(idGenerator++);
-        }
 
         /// Socket events
 		var socket = io();
@@ -228,6 +237,7 @@
         socket.on('newObject',function(data) {
             var obj = new GameObject();
             obj.fromJSON(data);
+            console.log("New object",obj);
             objectList.push(obj);
             sortObjectList();
         });
@@ -251,8 +261,10 @@
 		
         function createObjectFromPrefab(prefab) {
             var obj = prefab.instantiate();
-            obj.getEnabledComponent(ComponentTransform).pos.x = canvasX + canvas.width/2;
-            obj.getEnabledComponent(ComponentTransform).pos.y = canvasY + canvas.height/2;
+            obj.getEnabledComponent(ComponentTransform).setPos({
+                x : canvasX + canvas.width/2,
+                y : canvasY + canvas.height/2
+            })
             return obj;
         }
         
@@ -339,8 +351,10 @@
         var selectingObject = new Set();
         
         function onMouseDown(e) {
+            if(e.button != 0) return true; // only capture left click
             e.preventDefault();
             canvas.focus();
+
             mouseLastPos = {
                 x           : e.pageX - $(canvas).offset().left,
                 y           : e.pageY - $(canvas).offset().top,
@@ -382,6 +396,8 @@
         canvas.addEventListener("mousemove",onMouseMove);
         
         function onMouseUp(e) {
+            if(e.button != 0) return true; // only capture left click
+            
             mouseLastPos.down = false;
             var clickPos = {
                 x : canvasX + canvas.width/2 + (mouseLastPos.x-canvas.width/2)/canvasScale,
