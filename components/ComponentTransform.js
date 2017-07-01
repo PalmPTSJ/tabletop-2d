@@ -9,8 +9,8 @@ class ComponentTransform extends Component {
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
-            pos         : this.pos,
-            size        : this.size,
+            pos         : Object.assign({},this.pos),
+            size        : Object.assign({},this.size),
             parentId    : this.parent==null?null:this.parent.getGameObject().id,
             rotation    : this.rotation
         });
@@ -26,7 +26,6 @@ class ComponentTransform extends Component {
     }
     
     setPos(newPos) {
-        console.log("Set Pos to ",newPos);
         if(newPos.x != undefined) this.pos.x = newPos.x;
         if(newPos.y != undefined) this.pos.y = newPos.y;
         if(newPos.z != undefined) this.pos.z = newPos.z;

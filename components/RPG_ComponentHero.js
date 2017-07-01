@@ -4,9 +4,9 @@
 class RPG_ComponentHero extends Component {
     constructor(name) {
         super(name);
-        this.HP = this.maxHP = 500;
-        this.attackSpeed = 1;
-        this.attack = {min:30,max:50};
+        this.HP = this.maxHP = 200;
+        this.attackSpeed = 1.5;
+        this.attack = {min:10,max:30};
         this.attackRange = 100;
         this.attackTargetId = null;
         this.attackTarget = null;
@@ -44,23 +44,52 @@ class RPG_ComponentHero extends Component {
     onUpdate(timestamp) {
         if(!super.onUpdate(timestamp)) return false;
         
+        let transform = this.gameObject.getEnabledComponent(ComponentTransform);
+        
+        this.attackTarget = getObjectFromId(this.attackTargetId);
         if(this.attackTarget != null) {
-            let myPos = this.gameObject.getEnabledComponent(ComponentTransform).pos;
+            let myPos = transform.pos;
             let targetPos = this.attackTarget.getEnabledComponent(ComponentTransform).pos;
             // draw attack target line
             ctx.save();
             //transform.setupCanvas();
             
             ctx.strokeStyle = "#F00";
-            ctx.globalAlpha = 0.4;
+            ctx.globalAlpha = 0.6;
             
             ctx.beginPath();
             ctx.moveTo(myPos.x,myPos.y);
             ctx.lineTo(targetPos.x,targetPos.y);
             ctx.stroke();
             
+            ctx.fillStyle = "#F00"
+            ctx.fillRect(targetPos.x-5,targetPos.y-5,10,10);
+            
             ctx.restore();
         }
+        
+        // draw health bar
+        ctx.save();
+        transform.setupCanvas();
+        
+        
+        ctx.globalAlpha = 1;
+        ctx.lineWidth=10;
+        
+        ctx.strokeStyle = "#F00";
+        ctx.beginPath();
+        ctx.moveTo(0,-20);
+        ctx.lineTo(transform.size.width,-20);
+        ctx.stroke();
+        
+        ctx.strokeStyle = "#0F0";
+        ctx.beginPath();
+        ctx.moveTo(0,-20);
+        ctx.lineTo(transform.size.width * this.HP / this.maxHP,-20);
+        ctx.stroke();
+        
+        ctx.restore();
+        
         return true;
         
     }
@@ -82,10 +111,10 @@ class RPG_ComponentHero extends Component {
             y : myPos.y-400
         });
         
-        console.log("Create new damage text");
+        /*console.log("Create new damage text");
         for(var id in objectList) {
             console.log(id,objectList[id].getEnabledComponent(ComponentTransform).pos);
-        }
+        }*/
         
         obj.getEnabledComponent(ComponentTextRenderer).text = ""+dmg;
         
@@ -93,6 +122,8 @@ class RPG_ComponentHero extends Component {
         obj.getEnabledComponent(ComponentAutoDestroy).countdown = 60;
         
         server_createObject(obj.toJSON());
+        
+        if(this.HP <= 0) server_deleteObject(this.gameObject.id);
         
     }
     
@@ -106,6 +137,7 @@ class RPG_ComponentHero extends Component {
         if(!super.onServerUpdate(timestamp)) return false;
         // if attacking
         if(this.attackCooldown > 0) this.attackCooldown--;
+        this.attackTarget = getObjectFromId(this.attackTargetId);
         if(this.attackTarget != null) {
             // if close enough
             let myPos = this.gameObject.getEnabledComponent(ComponentTransform).pos;
@@ -116,7 +148,6 @@ class RPG_ComponentHero extends Component {
                 if(this.attackCooldown <= 0) {
                     // attack
                     let dmg = Math.floor(Math.random()*(this.attack.max-this.attack.min+1)) + this.attack.min;
-                    console.log("Attack "+dmg);
                     this.attackTarget.getEnabledComponent(RPG_ComponentHero).takeDamage(dmg);
                     
                     this.attackCooldown = Math.round(120/this.attackSpeed);
@@ -141,9 +172,12 @@ class RPG_ComponentHero extends Component {
         builder.addTextField("Max HP",builder.autoEvent({ get:()=>{return this.maxHP}, set:(val)=>{this.maxHP = parseInt(val)} }));
         
         builder.addTextField("Attack Speed",builder.autoEvent({ get:()=>{return this.attackSpeed}, set:(val)=>{this.attackSpeed = parseFloat(val)} }));
+        builder.addTextField("Attack Range",builder.autoEvent({ get:()=>{return this.attackRange}, set:(val)=>{this.attackRange = parseFloat(val)} }));
 
         builder.addTextField("Attack Min",builder.autoEvent({ get:()=>{return this.attack.min}, set:(val)=>{this.attack.min = parseInt(val)} }));
         builder.addTextField("Attack Max",builder.autoEvent({ get:()=>{return this.attack.max}, set:(val)=>{this.attack.max = parseInt(val)} }));
+        
+        builder.addTextField("Attack Target",builder.autoEvent({ get:()=>{return this.attackTargetId}, set:(val)=>{this.attackTargetId = val} }));
     }  
 }
 
@@ -170,6 +204,7 @@ if(!isServer) {
             if(selectingObject.has(obj)) continue;
             if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos)) {
                 // attack that target
+                if(obj.getEnabledComponent(RPG_ComponentHero)) continue;
                 for(var selObj of selectingObject) {
                     if(selObj.getEnabledComponent(RPG_ComponentHero) != null) {
                         selObj.getEnabledComponent(RPG_ComponentHero).callRPC('RPC_setAttackTarget',{id:obj.id});

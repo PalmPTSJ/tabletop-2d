@@ -4,7 +4,7 @@ class ComponentTabletopObject extends Component {
     }
     onKeyPress(key) {
         super.onKeyPress(key);
-        if(key == 46) { // (DEL) = Delete object
+        if(key == 46 || key == 'k'.charCodeAt(0)) { // (DEL / K) = Delete object
             socket.emit("deleteObject",this.gameObject.id);
         }
         if(key == 'h'.charCodeAt(0)) { // (H) = Put in/out hand

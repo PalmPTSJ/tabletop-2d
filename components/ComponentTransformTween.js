@@ -6,7 +6,7 @@ class ComponentTransformTween extends ComponentTransform {
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
-            targetPos : this.targetPos,
+            targetPos : Object.assign({},this.targetPos),
             moveSpeed : this.moveSpeed
         });
     }
