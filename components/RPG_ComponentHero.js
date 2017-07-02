@@ -52,11 +52,9 @@ class RPG_ComponentHero extends Component {
             let targetPos = this.attackTarget.getEnabledComponent(ComponentTransform).pos;
             // draw attack target line
             ctx.save();
-            //transform.setupCanvas();
             
             ctx.strokeStyle = "#F00";
             ctx.globalAlpha = 0.6;
-            
             ctx.beginPath();
             ctx.moveTo(myPos.x,myPos.y);
             ctx.lineTo(targetPos.x,targetPos.y);
@@ -67,11 +65,34 @@ class RPG_ComponentHero extends Component {
             
             ctx.restore();
         }
+        else {
+            // draw walk line
+            let transformTween = this.gameObject.getEnabledComponent(ComponentTransformTween);
+            if(transformTween != null) {
+                let myPos = transformTween.pos;
+                let targetPos = transformTween.targetPos;
+                if(myPos.x != targetPos.x || myPos.y != targetPos.y) {
+                    // draw walking line
+                    ctx.save();
+                    
+                    ctx.strokeStyle = "#AA0";
+                    ctx.globalAlpha = 0.6;
+                    ctx.beginPath();
+                    ctx.moveTo(myPos.x,myPos.y);
+                    ctx.lineTo(targetPos.x,targetPos.y);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = "#AA0"
+                    ctx.fillRect(targetPos.x-5,targetPos.y-5,10,10);
+                    
+                    ctx.restore();
+                }
+            }
+        }
         
         // draw health bar
         ctx.save();
         transform.setupCanvas();
-        
         
         ctx.globalAlpha = 1;
         ctx.lineWidth=10;
@@ -110,11 +131,6 @@ class RPG_ComponentHero extends Component {
             x : myPos.x,
             y : myPos.y-400
         });
-        
-        /*console.log("Create new damage text");
-        for(var id in objectList) {
-            console.log(id,objectList[id].getEnabledComponent(ComponentTransform).pos);
-        }*/
         
         obj.getEnabledComponent(ComponentTextRenderer).text = ""+dmg;
         
@@ -204,7 +220,7 @@ if(!isServer) {
             if(selectingObject.has(obj)) continue;
             if(obj.getEnabledComponent(ComponentCursorCollider) && obj.getEnabledComponent(ComponentCursorCollider).isOver(clickPos)) {
                 // attack that target
-                if(obj.getEnabledComponent(RPG_ComponentHero)) continue;
+                if(obj.getEnabledComponent(RPG_ComponentHero) == null) continue;
                 for(var selObj of selectingObject) {
                     if(selObj.getEnabledComponent(RPG_ComponentHero) != null) {
                         selObj.getEnabledComponent(RPG_ComponentHero).callRPC('RPC_setAttackTarget',{id:obj.id});
