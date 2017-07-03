@@ -147,8 +147,24 @@ dicePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
 dicePrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',dicePrefab.toJSON());
 
-
-
+function createResourcePrefab(resImg,resName) {
+    var res = new Prefab("Resource - "+resName);
+    res.getComponent(ComponentTransform).fromJSON({
+        size    : {width:60,height:60}
+    });
+    res.addComponent((new ComponentImageRendererMulti()).fromJSON({
+        faces : [resImg,imageData.devCard_back]
+    }));
+    res.addComponent(new ComponentCursorCollider());
+    socket.emit('createPrefab',res.toJSON());
+    return res;
+}
+createResourcePrefab(imageData.res_brick,"Brick");
+createResourcePrefab(imageData.res_sheep,"Sheep");
+createResourcePrefab(imageData.res_stone,"Stone");
+createResourcePrefab(imageData.res_wood,"Wood");
+createResourcePrefab(imageData.res_wheat,"Wheat");
+/*
 var resourcePrefab = new Prefab("Resource");
 resourcePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:1},
@@ -158,7 +174,7 @@ resourcePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
     faces : [imageData.res_brick,imageData.res_sheep,imageData.res_stone,imageData.res_wood,imageData.res_wheat]
 }));
 resourcePrefab.addComponent(new ComponentCursorCollider());
-socket.emit('createPrefab',resourcePrefab.toJSON());
+socket.emit('createPrefab',resourcePrefab.toJSON());*/
 
 
 
@@ -194,7 +210,7 @@ socket.emit('createPrefab',deckPrefab.toJSON());
 var boardPiecePrefab = new Prefab("Board Piece");
 boardPiecePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:-1},
-    size    : {width:150,height:150}
+    size    : {width:170,height:170}
 });
 boardPiecePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
     faces : [imageData.board_brick,imageData.board_sheep,imageData.board_stone,imageData.board_wood,imageData.board_wheat,imageData.board_desert]
