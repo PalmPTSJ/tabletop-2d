@@ -121,8 +121,8 @@ class RPG_ComponentHero extends Component {
         this.HP -= dmg;
         // create damage text
         let myPos = this.gameObject.getEnabledComponent(ComponentTransform).pos;
+        
         let obj = RPG_ComponentHero.DamageTextPrefab.instantiate();
-        obj.getEnabledComponent(ComponentTransformTween).moveSpeed = 3;
         obj.getEnabledComponent(ComponentTransformTween).setPos({
             x : myPos.x,
             y : myPos.y-10
@@ -133,9 +133,6 @@ class RPG_ComponentHero extends Component {
         });
         
         obj.getEnabledComponent(ComponentTextRenderer).text = ""+dmg;
-        
-        obj.addComponent(new ComponentAutoDestroy());
-        obj.getEnabledComponent(ComponentAutoDestroy).countdown = 60;
         
         server_createObject(obj.toJSON());
         
@@ -200,9 +197,14 @@ class RPG_ComponentHero extends Component {
 // Static variable
 if(isServer) {
     RPG_ComponentHero.DamageTextPrefab = new EmptyPrefab("Damage Text");
-    RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentTransformTween());
+    RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentTransformTween().fromJSON({
+        moveSpeed : 3
+    }));
     RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentNetwork());
     RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentTextRenderer());
+    RPG_ComponentHero.DamageTextPrefab.addComponent((new ComponentAutoDestroy()).fromJSON({
+        countdown : 60
+    }));
 }
 
 classList["RPG_ComponentHero"] = RPG_ComponentHero;

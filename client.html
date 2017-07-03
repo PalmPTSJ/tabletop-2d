@@ -380,8 +380,15 @@
             // rotate offX , offY with globalRotation
             if(mouseLastPos.isMovingObject) {
                 for(var obj of selectingObject) {
-                    obj.getEnabledComponent(ComponentTransform).pos.x += (Math.cos(globalRotation * Math.PI / 180)*offX + Math.sin(globalRotation * Math.PI / 180)*offY) / canvasScale;
-                    obj.getEnabledComponent(ComponentTransform).pos.y += (- Math.sin(globalRotation * Math.PI / 180)*offX + Math.cos(globalRotation * Math.PI / 180)*offY) / canvasScale;
+                    let transform = obj.getEnabledComponent(ComponentTransform);
+                    if(transform) {
+                        transform.setPos({
+                            x : transform.pos.x + (Math.cos(globalRotation * Math.PI / 180)*offX + Math.sin(globalRotation * Math.PI / 180)*offY) / canvasScale,
+                            y : transform.pos.y + (- Math.sin(globalRotation * Math.PI / 180)*offX + Math.cos(globalRotation * Math.PI / 180)*offY) / canvasScale
+                        })
+                    }
+                    //obj.getEnabledComponent(ComponentTransform).pos.x += (Math.cos(globalRotation * Math.PI / 180)*offX + Math.sin(globalRotation * Math.PI / 180)*offY) / canvasScale;
+                    //obj.getEnabledComponent(ComponentTransform).pos.y += (- Math.sin(globalRotation * Math.PI / 180)*offX + Math.cos(globalRotation * Math.PI / 180)*offY) / canvasScale;
                 }
             }
             else {

@@ -1,10 +1,9 @@
-"use strict"
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs');
 
 app.listen( 8080 );
-console.log("Server started");
+localLog("Server started");
 
 function handler (req, res) {
     if(req.url == '/') req.url = '/client.html';
@@ -19,11 +18,17 @@ function handler (req, res) {
     });
 }
 
-function log(data) {
-	console.log(data);
-	io.emit('log',data);
+function localLog(data) { // log on server only
+    let now = new Date();
+    let logText = ("[" + ("0"+now.getHours()).substr(-2) + ':' + ("0"+now.getMinutes()).substr(-2) + ":" + ("0"+now.getSeconds()).substr(-2) + "] ") + data;
+	console.log(logText);
 }
-function getDebugName(socket) { return "["+socket.name+":"+socket.id+"]"; }
+
+function log(data) { // global log (both on server and client)
+    io.emit('log',data);
+    localLog(data);
+}
+function getDebugName(socket) { return "<"+socket.name+":"+socket.id+">"; }
 
 var objectList = {};
 var prefabList = {};
@@ -52,15 +57,15 @@ global.Image = class {
 };
 global.socket = io;
 
-console.log("Server ready !");
+localLog("Server ready !");
 
 global.server_createObject = function(data) {
-    //console.log("S_CREATE",data);
     if(data.id == null) {
         let id = "SO_"+(objectIdGenerator++);
         data.id = id;
     }
-    console.log("New object "+data.id+" created");
+    localLog("New object "+data.id+" created");
+    
     let obj = new GameObject();
     obj.fromJSON(data);
     objectList[data.id] = obj;
@@ -77,12 +82,12 @@ global.server_deleteObject = function(id) {
 }
 
 io.on('connection',function (socket) {
-	log("New connection from "+socket.request.connection.remoteAddress);
     
+	log("New connection from "+socket.request.connection.remoteAddress);
+    socket.name = "anonymous"+playerIdGenerator; // default name
     socket.emit('playerInfo',{
         id : playerIdGenerator++
     });
-    
     // send all object and prefab
     for(var id in prefabList) {
         socket.emit('newPrefab',prefabList[id]);
@@ -91,12 +96,13 @@ io.on('connection',function (socket) {
         socket.emit('newObject',objectList[id]);
     }
     
+    /// Event ///
 	socket.on('setName',function (name) {
 		socket.name = name; 
-		log("New name : "+name);
+		log(getDebugName(socket)+" change name to : "+name);
 	});
 	socket.on('disconnect',function () {
-		log("Player disconnected : "+getDebugName(socket));
+		log(getDebugName(socket)+" disconnected");
 	});
 	
 	socket.on('createPrefab',function (prefab) {
@@ -104,25 +110,14 @@ io.on('connection',function (socket) {
             let id = "SP_"+(prefabIdGenerator++);
             prefab.id = id;
         }
-        console.log("New prefab "+prefab.id+" created");
+        localLog("New prefab "+prefab.id+" created");
         prefabList[prefab.id] = prefab;
         
 		io.emit('newPrefab',prefab);
 	});
 	
 	socket.on('createObject',function (data) {
-        //console.log("C_CREATE",data);
-        
-        if(data.id == null) {
-            let id = "SO_"+(objectIdGenerator++);
-            data.id = id;
-        }
-        console.log("New object "+data.id+" created");
-        var obj = new GameObject();
-        obj.fromJSON(data);
-		objectList[data.id] = obj;
-        
-		io.emit('newObject',data);
+        global.server_createObject(data);
 	});
     
     socket.on('updateObject',function (data) {
@@ -144,11 +139,7 @@ io.on('connection',function (socket) {
     });
     
     socket.on('deleteObject',function (id) {
-        if(objectList[id] != undefined) {
-            objectList[id].destroy();
-            delete objectList[id];
-            io.emit('deleteObject',id);
-        }
+        global.server_deleteObject(id);
     });
 });
 

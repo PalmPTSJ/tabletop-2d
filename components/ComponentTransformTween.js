@@ -41,7 +41,7 @@ class ComponentTransformTween extends ComponentTransform {
     onServerUpdate(timestamp) {
         if(!super.onServerUpdate(timestamp)) return false;
         // tween
-        this.pos.z = this.targetPos.z;
+        this.pos.z = this.targetPos.z; // no z tween
         if(this.pos.x != this.targetPos.x || this.pos.y != this.targetPos.y) {
             if(Math.hypot(this.targetPos.x-this.pos.x,this.targetPos.y-this.pos.y) <= this.moveSpeed) {
                 // reach
@@ -54,10 +54,6 @@ class ComponentTransformTween extends ComponentTransform {
                 this.pos.y += Math.sin(angle) * this.moveSpeed;
             }
         }
-    }
-    
-    onKeyPress(key) {
-        super.onKeyPress(key);
     }
     
     buildInspector(builder) {

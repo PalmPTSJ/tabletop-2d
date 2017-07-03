@@ -1,10 +1,9 @@
-"use strict"
 var fs = require('fs');
 var vm = require("vm");
 var ctx;
 function importFile(file) { // Read and eval library
     var filedata = fs.readFileSync(file,'utf8');
-    console.log("Importing file "+file);
+    console.log("[server_components.js] Importing file "+file);
     vm.runInNewContext(filedata, ctx, '.');
 }
 // Import js file

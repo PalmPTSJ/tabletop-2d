@@ -28,11 +28,11 @@ class ComponentObjectStack extends Component {
             let obj = getObjectFromId(id);
             let objTransform = obj.getEnabledComponent(ComponentTransform);
             if(objTransform) {
-                objTransform.pos = {
+                objTransform.setPos({
                     x : transform.pos.x + (transform.size.width+10)*((i%colCount) + 1),
                     y : transform.pos.y + (transform.size.height+10)*(Math.floor(i/colCount)),
                     z : transform.pos.z
-                }
+                });
                 objTransform.rotation = transform.rotation;
                 objTransform.size = transform.size;
             }
@@ -53,11 +53,11 @@ class ComponentObjectStack extends Component {
             let obj = getObjectFromId(this.stackListId[0]);
             let objTransform = obj.getEnabledComponent(ComponentTransform);
             if(objTransform) {
-                objTransform.pos = {
+                objTransform.setPos({
                     x : transform.pos.x,
                     y : transform.pos.y,
                     z : transform.pos.z-1
-                }
+                });
                 objTransform.rotation = transform.rotation;
                 objTransform.size = transform.size;
             
@@ -74,7 +74,6 @@ class ComponentObjectStack extends Component {
             if(getObjectFromId(id) != null) newStackListId.push(id);
         }
         this.stackListId = newStackListId;
-        //this.updateTopOfStack();
         
         let transform = this.gameObject.getEnabledComponent(ComponentTransform);
         
@@ -111,8 +110,7 @@ class ComponentObjectStack extends Component {
         return true;
     }
     
-    addToStack(obj) {
-        // put object on top of stack
+    addToStack(obj) { // put object on top of stack
         this.stackListId.splice(0,0,obj.id);
     }
     
@@ -137,11 +135,11 @@ class ComponentObjectStack extends Component {
         let obj = getObjectFromId(this.stackListId[0]);
         let transform = this.gameObject.getEnabledComponent(ComponentTransform);
         if(obj.getEnabledComponent(ComponentTransform)) {
-            obj.getEnabledComponent(ComponentTransform).pos = {
+            obj.getEnabledComponent(ComponentTransform).setPos({
                 x : transform.pos.x+transform.size.width+10,
                 y : transform.pos.y,
                 z : transform.pos.z+1
-            }
+            });
         }
         this.stackListId.splice(0, 1);
         this.updateTopOfStack();

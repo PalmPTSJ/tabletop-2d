@@ -1,15 +1,16 @@
 class ComponentAutoDestroy extends Component {
     constructor(name) {
         super(name);
-        this.countdown = 100;
+        this.countdown = 120;
     }
     toJSON() {
         return Object.assign(super.toJSON(),{
-            
+            countdown : this.countdown
         });
     }
     fromJSON(data) {
         super.fromJSON(data);
+        if(data.countdown !== undefined) this.countdown = data.countdown;
         return this;
     }
     
