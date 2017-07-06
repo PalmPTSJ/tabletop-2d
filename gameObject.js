@@ -145,7 +145,6 @@ class GameObject extends EmptyPrefab {
     }
     
     addComponent(comp) {
-        //if(comp.id == null) comp.id = generateNewId();
         super.addComponent(comp);
         comp.gameObject = this;
     }
@@ -163,3 +162,10 @@ class GameObject extends EmptyPrefab {
     }
     
 }
+
+var classList = {
+    "Base" : Base,
+    "Prefab" : Prefab,
+    "EmptyPrefab" : EmptyPrefab,
+    "GameObject" : GameObject
+};

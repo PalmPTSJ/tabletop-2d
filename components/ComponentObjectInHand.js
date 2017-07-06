@@ -21,13 +21,13 @@ class ComponentObjectInHand extends Component {
     
     onStart() {
         super.onStart();
-        if(playerInfo.id != this.player && selectingObj.has(this.gameObject)) selectingObj.delete(this.gameObject);
+        if(myPlayerInfo.id != this.player && selectingObj.has(this.gameObject)) selectingObj.delete(this.gameObject);
     }
     
     onUpdate(timestamp) {
         if(!super.onUpdate(timestamp)) return false;
         
-        if(playerInfo.id != this.player) {
+        if(myPlayerInfo.id != this.player) {
             // cursor collider
             this.gameObject.getComponents(ComponentCursorCollider).forEach((comp)=>{
                 comp.disableForThisFrame(timestamp);
@@ -38,7 +38,7 @@ class ComponentObjectInHand extends Component {
         }
         
         // draw highlight
-        if(playerInfo.id == this.player) ctx.fillStyle = "#8FF";
+        if(myPlayerInfo.id == this.player) ctx.fillStyle = "#8FF";
         else ctx.fillStyle = "#FA0";
         
         var transform = this.gameObject.getEnabledComponent(ComponentTransform);
@@ -50,7 +50,7 @@ class ComponentObjectInHand extends Component {
         ctx.fillRect(0,0,transform.size.width,transform.size.height);
         ctx.globalAlpha = 1;
         
-        if(playerInfo.id != this.player) {
+        if(myPlayerInfo.id != this.player) {
             ctx.drawImage(this.handImg,0,0,transform.size.width,transform.size.height);
         }
         

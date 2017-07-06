@@ -85,8 +85,9 @@ io.on('connection',function (socket) {
     
 	log("New connection from "+socket.request.connection.remoteAddress);
     socket.name = "anonymous"+playerIdGenerator; // default name
-    socket.emit('playerInfo',{
-        id : playerIdGenerator++
+    socket.emit('setPlayerInfo',{
+        id : playerIdGenerator++ ,
+        name : socket.name
     });
     // send all object and prefab
     for(var id in prefabList) {

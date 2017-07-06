@@ -9,12 +9,12 @@ class ComponentTabletopObject extends Component {
         }
         if(key == 'h'.charCodeAt(0)) { // (H) = Put in/out hand
             var comp = this.gameObject.getEnabledComponent(ComponentObjectInHand);
-            if(comp && playerInfo.id == comp.player) {
+            if(comp && myPlayerInfo.id == comp.player) {
                 this.gameObject.deleteComponent(comp);
             }
             else if(!comp) {
                 this.gameObject.addComponent((new ComponentObjectInHand()).fromJSON({
-                    player : playerInfo.id
+                    player : myPlayerInfo.id
                 }));
             }
         }
