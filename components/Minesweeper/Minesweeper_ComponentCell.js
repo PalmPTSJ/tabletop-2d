@@ -54,11 +54,13 @@ class Minesweeper_ComponentCell extends Component {
     }
     
     RPC_open(params) { // [Server]
+        if(!isServer) return;
         let board = getObjectFromId(this.boardId);
         board.getEnabledComponent(Minesweeper_ComponentBoard).cellOpen(this.cellPos);
     }
     
     RPC_flag(params) { // [Server]
+        if(!isServer) return;
         let board = getObjectFromId(this.boardId);
         board.getEnabledComponent(Minesweeper_ComponentBoard).cellFlag(this.cellPos);
     }

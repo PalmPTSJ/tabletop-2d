@@ -8,8 +8,7 @@ class Minesweeper_ComponentBoard extends Component {
         this.mineCount = 40;
         this.cellIdList = [[]];
         
-        // Local variable
-        this.flagCount = 0; // [Server]
+        this.flagCount = 0;
     }
     
     toJSON() {
@@ -17,7 +16,8 @@ class Minesweeper_ComponentBoard extends Component {
             gameState : this.gameState,
             boardSize : Object.assign({},this.boardSize),
             mineCount : this.mineCount,
-            cellIdList : this.cellIdList
+            cellIdList : this.cellIdList,
+            flagCount : this.flagCount
         });
     }
     fromJSON(data) {
@@ -27,12 +27,19 @@ class Minesweeper_ComponentBoard extends Component {
         if(data.boardSize !== undefined) this.boardSize = {width : data.boardSize.width , height : data.boardSize.height};
         if(data.mineCount !== undefined) this.mineCount = data.mineCount;
         if(data.cellIdList !== undefined) this.cellIdList = data.cellIdList;
+        if(data.flagCount !== undefined) this.flagCount = data.flagCount;
         
         return this;
     }
     
     onDestroy() {
-        
+        if(isServer) {
+            for(let row of this.cellIdList) {
+                for(let id of row) {
+                    server_deleteObject(id);
+                }
+            }
+        }
     }
     
     onUpdate(timestamp) {
@@ -65,6 +72,7 @@ class Minesweeper_ComponentBoard extends Component {
     }
     
     RPC_start(params) {
+        if(!isServer) return;
         // remove old cell
         for(let row of this.cellIdList) {
             for(let id of row) {
@@ -74,15 +82,18 @@ class Minesweeper_ComponentBoard extends Component {
         this.cellIdList = [];
         // create new cell
         let transform = this.gameObject.getEnabledComponent(ComponentTransform);
-        for(let i = 0;i < this.boardSize.width;i++) {
+        for(let i = 0;i < this.boardSize.height;i++) {
             this.cellIdList.push([]);
-            for(let j = 0;j < this.boardSize.height;j++) {
+            for(let j = 0;j < this.boardSize.width;j++) {
                 let obj = Minesweeper_ComponentBoard.CellPrefab.instantiate();
                 let objTransform = obj.getEnabledComponent(ComponentTransform);
-                objTransform.size = {width : (transform.size.width - 30) / this.boardSize.height , height : (transform.size.height - 30) / this.boardSize.width};
+                objTransform.size = {
+                    width : (transform.size.width - 30) / this.boardSize.width - 3 , 
+                    height : (transform.size.height - 30) / this.boardSize.height - 3
+                };
                 objTransform.setPos({
-                    x : transform.pos.x + j*objTransform.size.width + 15,
-                    y : transform.pos.y + i*objTransform.size.height + 15,
+                    x : transform.pos.x + j*(objTransform.size.width+3) + 15,
+                    y : transform.pos.y + i*(objTransform.size.height+3) + 15,
                     z : transform.pos.z + 1
                 });
                 
@@ -96,6 +107,7 @@ class Minesweeper_ComponentBoard extends Component {
     }
     
     cellOpen(cellPos) { // [Server]
+        if(!isServer) return;
         let cell = getObjectFromId(this.cellIdList[cellPos.y][cellPos.x]).getEnabledComponent(Minesweeper_ComponentCell);
         if(cell.state != '?') return;
         if(this.gameState == "Idle" || this.gameState == "Lose" || this.gameState == "Win") return;
@@ -110,6 +122,7 @@ class Minesweeper_ComponentBoard extends Component {
                 }
             }
             for(let i = 0;i < this.mineCount;i++) {
+                if(candidate.length == 0) break;
                 // randomly choose from candidate
                 let idx = Math.floor(Math.random()*candidate.length);
                 // set mine there
@@ -124,6 +137,7 @@ class Minesweeper_ComponentBoard extends Component {
         if(cell.isMine) {
             cell.state = 'X';
             this.gameState = "Lose";
+            this.showGameLose();
         }
         else {
             // count cell around
@@ -154,6 +168,7 @@ class Minesweeper_ComponentBoard extends Component {
     }
     
     cellFlag(cellPos) { // [Server]
+        if(!isServer) return;
         let cell = getObjectFromId(this.cellIdList[cellPos.y][cellPos.x]).getEnabledComponent(Minesweeper_ComponentCell);
         if(cell.state != '?' && cell.state != 'F') return;
         if(this.gameState == "Idle" || this.gameState == "Lose" || this.gameState == "Win") return;
@@ -167,7 +182,8 @@ class Minesweeper_ComponentBoard extends Component {
         }
     }
     
-    checkWin() {
+    checkWin() { // [Server]
+        if(!isServer) return;
         for(let y = 0;y < this.boardSize.height;y++) {
             for(let x = 0;x < this.boardSize.width;x++) {
                 let cell = getObjectFromId(this.cellIdList[y][x]).getEnabledComponent(Minesweeper_ComponentCell);
@@ -180,6 +196,18 @@ class Minesweeper_ComponentBoard extends Component {
         if(this.gameState == "Playing") {
             // ok !
             this.gameState = "Win";
+        }
+    }
+    
+    showGameLose() { // [Server]
+        if(!isServer) return;
+        for(let y = 0;y < this.boardSize.height;y++) {
+            for(let x = 0;x < this.boardSize.width;x++) {
+                let cell = getObjectFromId(this.cellIdList[y][x]).getEnabledComponent(Minesweeper_ComponentCell);
+                if(cell.isMine) {
+                    cell.state = 'X';
+                }
+            }
         }
     }
     
