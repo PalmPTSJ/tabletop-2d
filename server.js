@@ -71,6 +71,8 @@ global.server_createObject = function(data) {
     objectList[data.id] = obj;
     
     io.emit('newObject',data);
+    
+    return data.id;
 }
 
 global.server_deleteObject = function(id) {

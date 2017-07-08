@@ -29,7 +29,13 @@ module.exports = function(context) {
     importFile("components/ComponentImageRendererMulti.js");
     
     importFile("components/ComponentAutoDestroy.js");
+    
     importFile("components/RPG_ComponentHero.js");
+    
+    importFile("components/minesweeper/Minesweeper_ComponentCell.js");
+    importFile("components/minesweeper/Minesweeper_ComponentCellRenderer.js");
+    importFile("components/minesweeper/Minesweeper_ComponentBoard.js");
+    
     
     return context;
 }

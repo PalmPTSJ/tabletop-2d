@@ -23,7 +23,7 @@ class ComponentRectRenderer extends ComponentRenderer { // Render rectangle
         transform.setupCanvas();
         
         ctx.fillStyle = this.color;
-        ctx.beginPath();
+        ctx.beginPath(); // ?
         ctx.rect(0,0,transform.size.width,transform.size.height);
         ctx.fill();
         

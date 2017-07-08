@@ -14,6 +14,7 @@ class ComponentTextRenderer extends ComponentRenderer {
     fromJSON(data) {
         super.fromJSON(data);
         if(data.text !== undefined) this.text = data.text;
+        if(data.font !== undefined) this.font = data.font;
         return this;
     }
 
