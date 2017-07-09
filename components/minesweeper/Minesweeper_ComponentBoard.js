@@ -171,7 +171,7 @@ class Minesweeper_ComponentBoard extends Component {
         if(!isServer) return;
         let cell = getObjectFromId(this.cellIdList[cellPos.y][cellPos.x]).getEnabledComponent(Minesweeper_ComponentCell);
         if(cell.state != '?' && cell.state != 'F') return;
-        if(this.gameState == "Idle" || this.gameState == "Lose" || this.gameState == "Win") return;
+        if(this.gameState == "Idle" || this.gameState == "First" || this.gameState == "Lose" || this.gameState == "Win") return;
         
         if(cell.state == '?') { cell.state = 'F'; this.flagCount++; }
         else if(cell.state == 'F') { cell.state = '?'; this.flagCount--; }

@@ -38,7 +38,7 @@ class Minesweeper_ComponentCellRenderer extends ComponentRenderer {
         transform.setupCanvas();
         
         // draw background
-        ctx.fillStyle = cell.state=='?'?"#888888":"#CCCCCC";
+        ctx.fillStyle = (cell.state=='?' || cell.state=='F')?"#888888":"#CCCCCC";
         ctx.beginPath();
         ctx.rect(0,0,transform.size.width,transform.size.height);
         ctx.fill();
