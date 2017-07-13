@@ -1,4 +1,4 @@
-class ComponentNetwork extends Component {
+class ComponentNetwork2 extends Component {
     constructor(name) {
         super(name);
         this.lastJSON = "";
@@ -69,4 +69,4 @@ class ComponentNetwork extends Component {
     }
 }
 
-classList["ComponentNetwork"] = ComponentNetwork;
+classList["ComponentNetwork2"] = ComponentNetwork2;
