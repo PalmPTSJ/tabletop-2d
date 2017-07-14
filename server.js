@@ -2,8 +2,17 @@ var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs');
 
-app.listen( 8080 );
-localLog("Server started");
+var program = require('commander');
+
+program
+    .version('0.1.0')
+    .option('-p, --port [PORT]', 'set server\'s port [8080]',8080)
+    .option('-l, --load [filename]', 'load save file from filename')
+    .option('-s, --save [filename]', 'set filename to save data to')
+    .parse(process.argv);
+
+app.listen(program.port);
+localLog("Server started at port "+program.port);
 
 function handler (req, res) {
     if(req.url == '/') req.url = '/client.html';
@@ -18,12 +27,12 @@ function handler (req, res) {
     });
 }
 
+
 function localLog(data) { // log on server only
     let now = new Date();
     let logText = ("[" + ("0"+now.getHours()).substr(-2) + ':' + ("0"+now.getMinutes()).substr(-2) + ":" + ("0"+now.getSeconds()).substr(-2) + "] ") + data;
 	console.log(logText);
 }
-
 function log(data) { // global log (both on server and client)
     io.emit('log',data);
     localLog(data);
@@ -57,7 +66,21 @@ global.Image = class {
 };
 global.socket = io;
 
-localLog("Server ready !");
+global.server_createPrefab = function(data) {
+    if(data.id == null) {
+        let id = "SP_"+(prefabIdGenerator++);
+        data.id = id;
+    }
+    localLog("New prefab "+data.id+" created");
+    
+    let prefab = new EmptyPrefab();
+    prefab.fromJSON(data);
+    prefabList[data.id] = prefab;
+    
+    io.emit('newPrefab',data);
+    
+    return data.id;
+}
 
 global.server_createObject = function(data) {
     if(data.id == null) {
@@ -74,7 +97,6 @@ global.server_createObject = function(data) {
     
     return data.id;
 }
-
 global.server_deleteObject = function(id) {
     if(objectList[id] != undefined) {
         objectList[id].destroy();
@@ -83,6 +105,64 @@ global.server_deleteObject = function(id) {
     }
 }
 
+function saveGame(filename) {
+    let prefabData = {};
+    for(let id in prefabList) {
+        let prefab = prefabList[id];
+        prefabData[id] = prefab.toJSON();
+    }
+    
+    let objectData = {};
+    for(let id in objectList) {
+        let object = objectList[id];
+        objectData[id] = object.toJSON();
+    }
+    
+    let data = {
+        prefab : prefabData,
+        object : objectData,
+        idGenerator : idGenerator,
+        objectIdGenerator : objectIdGenerator,
+        prefabIdGenerator : prefabIdGenerator
+    };
+    
+    localLog("Saving data to : "+filename);
+    fs.writeFileSync(filename,JSON.stringify(data, null, 4));
+    localLog("Save completed");
+}
+
+function loadGame(filename) {
+    // clear current game [TODO : Send clear event]
+    objectList = {};
+    prefabList = {};
+    
+    localLog("Loading data from : "+filename);
+    
+    let dataStr = fs.readFileSync(filename);
+    let data = JSON.parse(dataStr);
+    
+    // load prefabs
+    let prefabData = data.prefab;
+    for(let id in prefabData) {
+        global.server_createPrefab(prefabData[id]);
+    }
+    
+    // load objects
+    let objectData = data.object;
+    for(let id in objectData) {
+        global.server_createObject(objectData[id]);
+    }
+    
+    // load other parameters
+    idGenerator = data.idGenerator;
+    objectIdGenerator = data.objectIdGenerator;
+    prefabIdGenerator = data.prefabIdGenerator;
+    
+    localLog("Load completed");
+}
+
+
+localLog("Server ready !");
 io.on('connection',function (socket) {
     
 	log("New connection from "+socket.request.connection.remoteAddress);
@@ -93,13 +173,14 @@ io.on('connection',function (socket) {
     });
     // send all object and prefab
     for(var id in prefabList) {
-        socket.emit('newPrefab',prefabList[id]);
+        console.log(prefabList[id]);
+        socket.emit('newPrefab',prefabList[id].toJSON());
     }
     for(var id in objectList) {
-        socket.emit('newObject',objectList[id]);
+        socket.emit('newObject',objectList[id].toJSON());
     }
     
-    /// Event ///
+    /// Players Event ///
 	socket.on('setName',function (name) {
 		socket.name = name; 
 		log(getDebugName(socket)+" change name to : "+name);
@@ -108,28 +189,19 @@ io.on('connection',function (socket) {
 		log(getDebugName(socket)+" disconnected");
 	});
 	
-	socket.on('createPrefab',function (prefab) {
-        if(prefab.id == null) {
-            let id = "SP_"+(prefabIdGenerator++);
-            prefab.id = id;
-        }
-        localLog("New prefab "+prefab.id+" created");
-        prefabList[prefab.id] = prefab;
-        
-		io.emit('newPrefab',prefab);
+    /// Game Event ///
+	socket.on('createPrefab',function (data) {
+        global.server_createPrefab(data);
 	});
-	
 	socket.on('createObject',function (data) {
         global.server_createObject(data);
 	});
-    
     socket.on('updateObject',function (data) {
         if(objectList[data.id] != undefined) {
             objectList[data.id].getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
             socket.broadcast.emit('updateObject',data); // broadcast to everyone except sender
         }
     });
-    
     socket.on('callRPC',function(data) {
         var obj = objectList[data.objId];
         if(obj == undefined) return;
@@ -140,9 +212,16 @@ io.on('connection',function (socket) {
             }
         }
     });
-    
     socket.on('deleteObject',function (id) {
         global.server_deleteObject(id);
+    });
+    
+    /// Server Events ///
+    socket.on('saveGame',function (filename) {
+        saveGame(filename);
+    });
+    socket.on('loadGame',function (filename) {
+        loadGame(filename);
     });
 });
 
