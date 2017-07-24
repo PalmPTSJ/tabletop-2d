@@ -4,7 +4,8 @@ Author      : PalmPTSJ
 **/
 
 var imageData = {
-    
+    money : 'http://www.maplestory2training.com/wp-content/uploads/maplestory-mesos.png',
+    coin : 'https://usercontent2.hubstatic.com/10173223_f260.jpg'
 }
 
 // Create prefab
@@ -26,6 +27,22 @@ heroPrefab.addComponent(new RPG_ComponentPlayerControllable());
 
 socket.emit('createPrefab',heroPrefab.toJSON());
 
+// For drop table
+var moneyPrefab = new Prefab("RPG - Money (test)");
+moneyPrefab.getComponent(ComponentTransform).fromJSON({
+    pos     : {x:0,y:0,z:1},
+    size    : {width:50,height:50}
+});
+moneyPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
+    url : imageData.money
+}));
+moneyPrefab.addComponent(new ComponentCursorCollider());
+
+var coinPrefab = new Prefab();
+coinPrefab.fromJSON(moneyPrefab.toJSON()); // copy from moneyPrefab
+coinPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
+    url : imageData.coin
+}));
 
 
 var enemyPrefab = new EmptyPrefab("RPG - Enemy");
@@ -35,12 +52,22 @@ enemyPrefab.addComponent(new ComponentTabletopObject());
 enemyPrefab.addComponent(new ComponentCursorCollider());
 enemyPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:-1},
-    size    : {width:40,height:60}
+    size    : {width:30,height:30}
 });
 enemyPrefab.addComponent((new ComponentRectRenderer()).fromJSON({
     color : "#AA0000"
 }));
-enemyPrefab.addComponent(new RPG_ComponentHealth());
+enemyPrefab.addComponent(new RPG_ComponentHealth().fromJSON({
+    HP : 50,
+    maxHP : 50
+}));
 enemyPrefab.addComponent(new RPG_ComponentAttack());
 enemyPrefab.addComponent(new RPG_ComponentEnemy());
+enemyPrefab.addComponent((new RPG_ComponentDropTable()).fromJSON({
+    dropTable : [
+        {prefabData : moneyPrefab.toJSON(), prob:0.5},
+        {prefabData : coinPrefab.toJSON(), prob:1}
+    ]
+}));
+
 socket.emit('createPrefab',enemyPrefab.toJSON());

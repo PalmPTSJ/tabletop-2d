@@ -64,7 +64,6 @@ function getObjectFromId(id) {
     for(var obj of objectList) {
         if(obj.id == id) return obj;
     }
-    console.log("Search ",id,"null");
     return null;
 }
 global.getObjectFromId = getObjectFromId;

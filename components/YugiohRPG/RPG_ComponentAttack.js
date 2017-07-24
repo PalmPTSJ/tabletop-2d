@@ -102,7 +102,10 @@ class RPG_ComponentAttack extends Component {
         // if attacking
         if(this.attackCooldown > 0) this.attackCooldown--;
         this.attackTarget = getObjectFromId(this.attackTargetId);
-        if(this.attackTarget != null) {
+        if(this.attackTarget == null) {
+            this.attackTargetId = null;
+        }
+        else {
             // if close enough
             let myPos = this.gameObject.getEnabledComponent(ComponentTransform).pos;
             let targetPos = this.attackTarget.getEnabledComponent(ComponentTransform).pos;
