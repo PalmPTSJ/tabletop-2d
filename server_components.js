@@ -30,7 +30,11 @@ module.exports = function(context) {
     
     importFile("components/ComponentAutoDestroy.js");
     
-    importFile("components/RPG_ComponentHero.js");
+    importFile("components/YugiohRPG/RPG_ComponentHero.js");
+    importFile("components/YugiohRPG/RPG_ComponentHealth.js");
+    importFile("components/YugiohRPG/RPG_ComponentAttack.js");
+    importFile("components/YugiohRPG/RPG_ComponentEnemy.js");
+    importFile("components/YugiohRPG/RPG_ComponentPlayerControllable.js");
     
     importFile("components/minesweeper/Minesweeper_ComponentCell.js");
     importFile("components/minesweeper/Minesweeper_ComponentCellRenderer.js");

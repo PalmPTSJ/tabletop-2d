@@ -39,7 +39,7 @@ function log(data) { // global log (both on server and client)
 }
 function getDebugName(socket) { return "<"+socket.name+":"+socket.id+">"; }
 
-var objectList = {};
+var objectList = [];
 var prefabList = {};
 
 var objectIdGenerator = 0;
@@ -58,9 +58,17 @@ var components = require('./server_components.js')(global);
 for(var comp in global.classList) {
     global[comp] = global.classList[comp];
 }
-global.getObjectFromId = function(id) {
-    return objectList[id];
+
+function getObjectFromId(id) {
+    if(id == null) return null;
+    for(var obj of objectList) {
+        if(obj.id == id) return obj;
+    }
+    console.log("Search ",id,"null");
+    return null;
 }
+global.getObjectFromId = getObjectFromId;
+
 global.Image = class {
     constructor() {this.src = undefined;}
 };
@@ -91,17 +99,20 @@ global.server_createObject = function(data) {
     
     let obj = new GameObject();
     obj.fromJSON(data);
-    objectList[data.id] = obj;
+    objectList.push(obj);
     
     io.emit('newObject',data);
     
     return data.id;
 }
 global.server_deleteObject = function(id) {
-    if(objectList[id] != undefined) {
-        objectList[id].destroy();
-        delete objectList[id];
-        io.emit('deleteObject',id);
+    for(let i = 0;i < objectList.length;i++) {
+        if(objectList[i].id == id) {
+            // delete
+            objectList[i].destroy();
+            objectList.splice(i,1);
+            io.emit('deleteObject',id);
+        }
     }
 }
 
@@ -112,10 +123,9 @@ function saveGame(filename) {
         prefabData[id] = prefab.toJSON();
     }
     
-    let objectData = {};
-    for(let id in objectList) {
-        let object = objectList[id];
-        objectData[id] = object.toJSON();
+    let objectData = [];
+    for(let obj of objectList) {
+        objectData.push(obj.toJSON());
     }
     
     let data = {
@@ -133,7 +143,7 @@ function saveGame(filename) {
 
 function loadGame(filename) {
     // clear current game [TODO : Send clear event]
-    objectList = {};
+    objectList = [];
     prefabList = {};
     
     localLog("Loading data from : "+filename);
@@ -149,8 +159,8 @@ function loadGame(filename) {
     
     // load objects
     let objectData = data.object;
-    for(let id in objectData) {
-        global.server_createObject(objectData[id]);
+    for(let obj of objectData) {
+        global.server_createObject(obj);
     }
     
     // load other parameters
@@ -173,11 +183,10 @@ io.on('connection',function (socket) {
     });
     // send all object and prefab
     for(var id in prefabList) {
-        console.log(prefabList[id]);
         socket.emit('newPrefab',prefabList[id].toJSON());
     }
-    for(var id in objectList) {
-        socket.emit('newObject',objectList[id].toJSON());
+    for(var obj of objectList) {
+        socket.emit('newObject',obj.toJSON());
     }
     
     /// Players Event ///
@@ -197,14 +206,15 @@ io.on('connection',function (socket) {
         global.server_createObject(data);
 	});
     socket.on('updateObject',function (data) {
-        if(objectList[data.id] != undefined) {
-            objectList[data.id].getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
+        let obj = getObjectFromId(data.id);
+        if(obj != null) {
+            obj.getEnabledComponent(ComponentNetwork).onNetworkUpdate(data);
             socket.broadcast.emit('updateObject',data); // broadcast to everyone except sender
         }
     });
     socket.on('callRPC',function(data) {
-        var obj = objectList[data.objId];
-        if(obj == undefined) return;
+        var obj = getObjectFromId(data.objId);
+        if(obj == null) return;
         for(var comp of obj.components) {
             if(comp.id == data.compId) {
                 comp.callRPC(data.func,data.params);
@@ -227,8 +237,8 @@ io.on('connection',function (socket) {
 
 function update() {
     var timestamp = Date.now();
-    for(var id in objectList) {
-        objectList[id].serverUpdate(timestamp);
+    for(var obj of objectList) {
+        obj.serverUpdate(timestamp);
     }
 }
 

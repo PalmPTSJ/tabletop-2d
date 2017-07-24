@@ -4,7 +4,6 @@
 class RPG_ComponentHero extends Component {
     constructor(name) {
         super(name);
-        this.HP = this.maxHP = 200;
         this.attackSpeed = 1.5;
         this.attack = {min:10,max:30};
         this.attackRange = 100;
@@ -15,8 +14,6 @@ class RPG_ComponentHero extends Component {
     
     toJSON() {
         return Object.assign(super.toJSON(),{
-            HP : this.HP,
-            maxHP : this.maxHP,
             attackSpeed : this.attackSpeed,
             attackRange : this.attackRange,
             attackTargetId : this.attackTargetId
@@ -25,8 +22,6 @@ class RPG_ComponentHero extends Component {
     fromJSON(data) {
         super.fromJSON(data);
         
-        if(data.HP !== undefined) this.HP = data.HP;
-        if(data.maxHP !== undefined) this.maxHP = data.maxHP;
         if(data.attackSpeed !== undefined) this.attackSpeed = data.attackSpeed;
         if(data.attackRange !== undefined) this.attackRange = data.attackRange;
         if(data.attackTargetId !== undefined) {
@@ -89,55 +84,8 @@ class RPG_ComponentHero extends Component {
                 }
             }
         }
-        
-        // draw health bar
-        ctx.save();
-        transform.setupCanvas();
-        
-        ctx.globalAlpha = 1;
-        ctx.lineWidth=10;
-        
-        ctx.strokeStyle = "#F00";
-        ctx.beginPath();
-        ctx.moveTo(0,-20);
-        ctx.lineTo(transform.size.width,-20);
-        ctx.stroke();
-        
-        ctx.strokeStyle = "#0F0";
-        ctx.beginPath();
-        ctx.moveTo(0,-20);
-        ctx.lineTo(transform.size.width * this.HP / this.maxHP,-20);
-        ctx.stroke();
-        
-        ctx.restore();
-        
+
         return true;
-        
-    }
-    
-    takeDamage(dmg) {
-        if(!isServer) return;
-        
-        this.HP -= dmg;
-        // create damage text
-        let myPos = this.gameObject.getEnabledComponent(ComponentTransform).pos;
-        
-        let obj = RPG_ComponentHero.DamageTextPrefab.instantiate();
-        obj.getEnabledComponent(ComponentTransformTween).setPos({
-            x : myPos.x,
-            y : myPos.y-10
-        });
-        obj.getEnabledComponent(ComponentTransformTween).setTargetPos({
-            x : myPos.x,
-            y : myPos.y-400
-        });
-        
-        obj.getEnabledComponent(ComponentTextRenderer).text = ""+dmg;
-        
-        server_createObject(obj.toJSON());
-        
-        if(this.HP <= 0) server_deleteObject(this.gameObject.id);
-        
     }
     
     RPC_setAttackTarget(params) {
@@ -161,7 +109,8 @@ class RPG_ComponentHero extends Component {
                 if(this.attackCooldown <= 0) {
                     // attack
                     let dmg = Math.floor(Math.random()*(this.attack.max-this.attack.min+1)) + this.attack.min;
-                    this.attackTarget.getEnabledComponent(RPG_ComponentHero).takeDamage(dmg);
+                    
+                    this.attackTarget.getEnabledComponent(RPG_ComponentHealth).takeDamage(dmg);
                     
                     this.attackCooldown = Math.round(120/this.attackSpeed);
                 }
@@ -181,9 +130,6 @@ class RPG_ComponentHero extends Component {
     buildInspector(builder) {
         super.buildInspector(builder);
 
-        builder.addTextField("HP",builder.autoEvent({ get:()=>{return this.HP}, set:(val)=>{this.HP = parseInt(val)} }));
-        builder.addTextField("Max HP",builder.autoEvent({ get:()=>{return this.maxHP}, set:(val)=>{this.maxHP = parseInt(val)} }));
-        
         builder.addTextField("Attack Speed",builder.autoEvent({ get:()=>{return this.attackSpeed}, set:(val)=>{this.attackSpeed = parseFloat(val)} }));
         builder.addTextField("Attack Range",builder.autoEvent({ get:()=>{return this.attackRange}, set:(val)=>{this.attackRange = parseFloat(val)} }));
 
@@ -192,19 +138,6 @@ class RPG_ComponentHero extends Component {
         
         builder.addTextField("Attack Target",builder.autoEvent({ get:()=>{return this.attackTargetId}, set:(val)=>{this.attackTargetId = val} }));
     }  
-}
-
-// Static variable
-if(isServer) {
-    RPG_ComponentHero.DamageTextPrefab = new EmptyPrefab("Damage Text");
-    RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentTransformTween().fromJSON({
-        moveSpeed : 3
-    }));
-    RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentNetwork());
-    RPG_ComponentHero.DamageTextPrefab.addComponent(new ComponentTextRenderer());
-    RPG_ComponentHero.DamageTextPrefab.addComponent((new ComponentAutoDestroy()).fromJSON({
-        countdown : 60
-    }));
 }
 
 classList["RPG_ComponentHero"] = RPG_ComponentHero;
