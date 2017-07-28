@@ -4,8 +4,7 @@ Author      : PalmPTSJ
 **/
 
 // Create prefab
-var boardPrefab = new Prefab("");
-boardPrefab.addComponent(new ComponentCursorCollider());
+var boardPrefab = new PrefabTabletop("???");
 boardPrefab.addComponent(new Minesweeper_ComponentBoard());
 
 // Board Tiny : 5x5 , 5 mines

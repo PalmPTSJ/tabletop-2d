@@ -59,103 +59,74 @@ var imageData = {
 }
 
 // Create prefab
-var boardPrefab = new Prefab("Board");
+var boardPrefab = new PrefabStaticImage("Board",imageData.board);
 boardPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:-1},
     size    : {width:800,height:800}
 });
-boardPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
-    url     : imageData.board
-}));
 socket.emit('createPrefab',boardPrefab.toJSON());
 
 
 
-var housePrefab = new Prefab("House");
+var housePrefab = new PrefabImageMulti("House",[imageData.house_red,imageData.house_green,imageData.house_blue,imageData.house_yellow]);
 housePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:1},
     size    : {width:50,height:50}
 });
-housePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.house_red,imageData.house_green,imageData.house_blue,imageData.house_yellow]
-}));
-housePrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',housePrefab.toJSON());
 
 
 
-var cityPrefab = new Prefab("City");
+var cityPrefab = new PrefabImageMulti("City",[imageData.city_red,imageData.city_green,imageData.city_blue,imageData.city_yellow]);
 cityPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:1},
     size    : {width:50,height:50}
 });
-cityPrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.city_red,imageData.city_green,imageData.city_blue,imageData.city_yellow]
-}));
-cityPrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',cityPrefab.toJSON());
 
 
 
-var roadPrefab = new Prefab("Road");
+var roadPrefab = new PrefabImageMulti("Road",[imageData.road_red,imageData.road_green,imageData.road_blue,imageData.road_yellow]);
 roadPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:1},
     size    : {width:50,height:10}
 });
-roadPrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.road_red,imageData.road_green,imageData.road_blue,imageData.road_yellow]
-}));
-roadPrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',roadPrefab.toJSON());
 
 
 
-var resourceGuidePrefab = new Prefab("Resource Guide");
+var resourceGuidePrefab = new PrefabImage("Resource Guide",imageData.resourceGuide);
 resourceGuidePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:2},
     size    : {width:500,height:500}
 });
-resourceGuidePrefab.addComponent((new ComponentImageRenderer()).fromJSON({
-    url : imageData.resourceGuide
-}));
-resourceGuidePrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',resourceGuidePrefab.toJSON());
 
 
 
-var thiefPrefab = new Prefab("Thief");
+var thiefPrefab = new PrefabImage("Thief",imageData.thief);
 thiefPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:1},
     size    : {width:50,height:50}
 });
-thiefPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
-    url : imageData.thief
-}));
-thiefPrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',thiefPrefab.toJSON());
 
 
 
-var dicePrefab = new Prefab("Dice");
+var dicePrefab = new PrefabImageMulti("Dice",[imageData.dice1,imageData.dice2,imageData.dice3,imageData.dice4,imageData.dice5,imageData.dice6]);
 dicePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:2},
     size    : {width:100,height:100}
 });
-dicePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.dice1,imageData.dice2,imageData.dice3,imageData.dice4,imageData.dice5,imageData.dice6]
-}));
-dicePrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',dicePrefab.toJSON());
 
+
+
 function createResourcePrefab(resImg,resName) {
-    var res = new Prefab("Resource - "+resName);
+    var res = new PrefabImageMulti("Resource - "+resName,[resImg,imageData.devCard_back]);
     res.getComponent(ComponentTransform).fromJSON({
         size    : {width:60,height:60}
     });
-    res.addComponent((new ComponentImageRendererMulti()).fromJSON({
-        faces : [resImg,imageData.devCard_back]
-    }));
-    res.addComponent(new ComponentCursorCollider());
     socket.emit('createPrefab',res.toJSON());
     return res;
 }
@@ -164,30 +135,15 @@ createResourcePrefab(imageData.res_sheep,"Sheep");
 createResourcePrefab(imageData.res_stone,"Stone");
 createResourcePrefab(imageData.res_wood,"Wood");
 createResourcePrefab(imageData.res_wheat,"Wheat");
-/*
-var resourcePrefab = new Prefab("Resource");
-resourcePrefab.getComponent(ComponentTransform).fromJSON({
-    pos     : {x:0,y:0,z:1},
-    size    : {width:60,height:60}
-});
-resourcePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.res_brick,imageData.res_sheep,imageData.res_stone,imageData.res_wood,imageData.res_wheat]
-}));
-resourcePrefab.addComponent(new ComponentCursorCollider());
-socket.emit('createPrefab',resourcePrefab.toJSON());*/
 
 
 
 function createDevPrefab(cardImg,cardName) {
-    var card = new Prefab("Dev card - "+cardName);
+    var card = new PrefabImageMulti("Dev card - "+cardName,[cardImg,imageData.devCard_back]);
     card.getComponent(ComponentTransform).fromJSON({
         pos     : {x:0,y:0,z:0},
         size    : {width:60,height:100}
     });
-    card.addComponent((new ComponentImageRendererMulti()).fromJSON({
-        faces : [cardImg,imageData.devCard_back]
-    }));
-    card.addComponent(new ComponentCursorCollider());
     socket.emit('createPrefab',card.toJSON());
     return card;
 }
@@ -197,28 +153,27 @@ createDevPrefab(imageData.devCard_road,"Road");
 createDevPrefab(imageData.devCard_monopoly,"Monopoly");
 createDevPrefab(imageData.devCard_yearOfPlenty,"Year of Plenty");
 
-var deckPrefab = new Prefab("Dev Deck Holder");
+
+
+var deckPrefab = new PrefabTabletop("Dev Deck Holder");
 deckPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:0},
     size    : {width:60,height:100}
 });
 deckPrefab.addComponent(new ComponentObjectStack());
-deckPrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',deckPrefab.toJSON());
 
+
 // board piece prefab
-var boardPiecePrefab = new Prefab("Board Piece");
+var boardPiecePrefab = new PrefabImageMulti("Board Piece",[imageData.board_brick,imageData.board_sheep,imageData.board_stone,imageData.board_wood,imageData.board_wheat,imageData.board_desert]);
 boardPiecePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:-1},
     size    : {width:170,height:170}
 });
-boardPiecePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.board_brick,imageData.board_sheep,imageData.board_stone,imageData.board_wood,imageData.board_wheat,imageData.board_desert]
-}));
-boardPiecePrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',boardPiecePrefab.toJSON());
 
-var boardLabelPrefab = new Prefab("Board Number Label");
+
+var boardLabelPrefab = new PrefabTabletop("Board Number Label");
 boardLabelPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:0},
     size    : {width:40,height:30}
@@ -229,5 +184,4 @@ boardLabelPrefab.addComponent((new ComponentRectRenderer()).fromJSON({
 boardLabelPrefab.addComponent((new ComponentTextRenderer()).fromJSON({
     text : "2"
 }));
-boardLabelPrefab.addComponent(new ComponentCursorCollider());
 socket.emit('createPrefab',boardLabelPrefab.toJSON());

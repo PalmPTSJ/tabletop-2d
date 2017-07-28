@@ -61,6 +61,12 @@ class EmptyPrefab extends Base {
         return this;
     }
     
+    clone() { // create a clone of this object/prefab
+        let toRet = new this.constructor();
+        toRet.fromJSON(this.toJSON());
+        return toRet;
+    }
+    
     getComponent(clazz) {
         for(var comp of this.components) {
             if(comp instanceof clazz) return comp;
@@ -114,16 +120,6 @@ class EmptyPrefab extends Base {
     }
 }
 
-class Prefab extends EmptyPrefab {
-    constructor (name) {
-        super(name);
-        // default for this application, attach transform and network to everything
-        this.addComponent(new ComponentTransform());
-        this.addComponent(new ComponentNetwork());
-        this.addComponent(new ComponentTabletopObject());
-    }
-}
-
 class GameObject extends EmptyPrefab {
     constructor() {
         super("");
@@ -165,7 +161,6 @@ class GameObject extends EmptyPrefab {
 
 var classList = {
     "Base" : Base,
-    "Prefab" : Prefab,
     "EmptyPrefab" : EmptyPrefab,
     "GameObject" : GameObject
 };

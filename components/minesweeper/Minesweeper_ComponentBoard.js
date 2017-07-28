@@ -152,7 +152,7 @@ class Minesweeper_ComponentBoard extends Component {
             }
             cell.state = ''+mineAround;
             if(mineAround == 0) {
-                // open around
+                // open around (4 dir)
                 for(let dx = -1;dx <= 1;dx++) {
                     for(let dy = -1;dy <= 1;dy++) {
                         if(dx == 0 && dy == 0) continue;

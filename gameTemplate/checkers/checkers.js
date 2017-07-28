@@ -12,37 +12,23 @@ var imageData = {
 }
 
 // Create prefab
-var boardPrefab = new Prefab("Board");
+var boardPrefab = new PrefabStaticImage("Board",imageData.board);
 boardPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:-1},
     size    : {width:600,height:600}
 });
-boardPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
-    url     : imageData.board
-}));
-boardPrefab.addComponent((new ComponentTextRenderer()).fromJSON({
-    text : "Welcome to tabletop 2d ! Let's play checkers !"
-}));
 
-var blackPiecePrefab = new Prefab("Black Piece");
+var blackPiecePrefab = new PrefabImageMulti("Black Piece",[imageData.blackPiece,imageData.blackKing]);
 blackPiecePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:0},
     size    : {width:40,height:40}
 });
-blackPiecePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.blackPiece,imageData.blackKing]
-}));
-blackPiecePrefab.addComponent(new ComponentCursorCollider());
 
-var whitePiecePrefab = new Prefab("White Piece");
+var whitePiecePrefab = new PrefabImageMulti("White Piece",[imageData.whitePiece,imageData.whiteKing]);
 whitePiecePrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:0},
     size    : {width:40,height:40}
 });
-whitePiecePrefab.addComponent((new ComponentImageRendererMulti()).fromJSON({
-    faces : [imageData.whitePiece,imageData.whiteKing]
-}));
-whitePiecePrefab.addComponent(new ComponentCursorCollider());
 
 // create object
 socket.emit('createPrefab',boardPrefab.toJSON());

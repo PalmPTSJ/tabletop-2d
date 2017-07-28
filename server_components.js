@@ -10,6 +10,7 @@ function importFile(file) { // Read and eval library
 module.exports = function(context) {
     ctx = context;
     importFile("gameObject.js");
+    importFile("prefabTemplate.js");
 
     importFile("components/Component.js");
     importFile("components/ComponentTransform.js");

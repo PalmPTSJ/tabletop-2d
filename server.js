@@ -170,6 +170,9 @@ function loadGame(filename) {
     localLog("Load completed");
 }
 
+if(program.load) {
+    loadGame(program.load);
+}
 
 localLog("Server ready !");
 io.on('connection',function (socket) {

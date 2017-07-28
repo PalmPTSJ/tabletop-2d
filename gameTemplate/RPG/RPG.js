@@ -28,18 +28,13 @@ heroPrefab.addComponent(new RPG_ComponentPlayerControllable());
 socket.emit('createPrefab',heroPrefab.toJSON());
 
 // For drop table
-var moneyPrefab = new Prefab("RPG - Money (test)");
+var moneyPrefab = new PrefabImage("RPG - Money (test)",imageData.money);
 moneyPrefab.getComponent(ComponentTransform).fromJSON({
     pos     : {x:0,y:0,z:1},
     size    : {width:50,height:50}
 });
-moneyPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
-    url : imageData.money
-}));
-moneyPrefab.addComponent(new ComponentCursorCollider());
 
-var coinPrefab = new Prefab();
-coinPrefab.fromJSON(moneyPrefab.toJSON()); // copy from moneyPrefab
+var coinPrefab = moneyPrefab.clone(); // copy from moneyPrefab
 coinPrefab.addComponent((new ComponentImageRenderer()).fromJSON({
     url : imageData.coin
 }));
