@@ -5,10 +5,10 @@ var app = require('http').createServer(handler)
 var program = require('commander');
 
 program
-    .version('0.1.0')
+    .version('1.0')
     .option('-p, --port [PORT]', 'set server\'s port [8080]',8080)
     .option('-l, --load [filename]', 'load save file from filename')
-    .option('-s, --save [filename]', 'set filename to save data to')
+    //.option('-s, --save [filename]', 'set filename to save data to')
     .parse(process.argv);
 
 app.listen(program.port);
