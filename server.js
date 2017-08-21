@@ -11,6 +11,8 @@ program
     //.option('-s, --save [filename]', 'set filename to save data to')
     .parse(process.argv);
 
+program.port = process.env.PORT || program.port;
+    
 app.listen(program.port);
 localLog("Server started at port "+program.port);
 
