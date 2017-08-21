@@ -1,0 +1,29 @@
+{
+  "name": "tabletop-2d",
+  "version": "1.0.0",
+  "description": "A multiplayer sandbox environment for 2d tabletop game made in HTML5.",
+  "main": "server.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "dependencies": {
+    "commander": "^2.11.0",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PalmPTSJ/tabletop-2d.git"
+  },
+  "author": "PalmPTSJ",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PalmPTSJ/tabletop-2d/issues"
+  },
+  "homepage": "https://github.com/PalmPTSJ/tabletop-2d#readme"
+}
