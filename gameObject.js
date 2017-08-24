@@ -143,6 +143,7 @@ class GameObject extends EmptyPrefab {
     addComponent(comp) {
         super.addComponent(comp);
         comp.gameObject = this;
+        comp.onStart();
     }
     
     onKeyPress(keycode) {

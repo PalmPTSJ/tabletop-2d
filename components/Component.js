@@ -2,8 +2,8 @@ class Component extends Base {
     constructor(name) {
         super();
         
-        if(name == undefined) name = this.constructor.name;
-        this.name = name;
+        if(name === undefined) name = this.constructor.name;
+        else this.name = name;
         
         this.enabled = true;
         this.enabledThisFrame = true;

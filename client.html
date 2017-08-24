@@ -147,6 +147,12 @@
     <!-- Include components -->
     <script src="components/Component.js"></script>
     
+    <script src="components/Client.js"></script>
+    <script src="components/Client_KeyboardInput.js"></script>
+    
+    
+    
+    
     <script src="components/ComponentTransform.js"></script>
     <script src="components/ComponentTransformTween.js"></script>
     <script src="components/ComponentNetwork.js"></script>
@@ -176,6 +182,7 @@
     <script src="components/minesweeper/Minesweeper_ComponentBoard.js"></script>
     
     
+    
     <script src="objectInspector.js"></script>
     <!-- End include components -->
     <script> // HTML Related
@@ -201,6 +208,14 @@
         });
     </script>
 	<script>
+        
+        var clientObj = new GameObject();
+        clientObj.addComponent((new Client()).fromJSON({
+            canvas : canvas,
+            ctx : ctx
+        }));
+        
+        
         
         /// Debug function / Temp function
         var fpsCount = 0;
